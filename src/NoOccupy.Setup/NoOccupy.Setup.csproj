@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RootNamespace>NoOccupy.Setup</RootNamespace>
+    <AssemblyName>NoOccupy.Setup</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\NoOccupy\app.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Product>解除占用</Product>
+    <Company>NoOccupy</Company>
+    <Description>解除占用安装程序</Description>
+    <Copyright>Copyright © 2026</Copyright>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj-core\**;obj-ui\**;bin-core\**;bin-ui\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <EmbeddedResource Include="..\NoOccupy\bin\Release\net48\NoOccupy.exe" LogicalName="NoOccupy.exe" />
+    <EmbeddedResource Include="..\NoOccupy\bin\Release\net48\NoOccupy.exe.config" LogicalName="NoOccupy.exe.config" />
+  </ItemGroup>
+
+  <Target Name="BuildMainApp" BeforeTargets="PrepareForBuild">
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\NoOccupy\NoOccupy.csproj"
+             Targets="Build"
+             Properties="Configuration=Release" />
+  </Target>
+
+</Project>

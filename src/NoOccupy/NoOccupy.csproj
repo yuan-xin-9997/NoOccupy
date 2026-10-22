@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RootNamespace>NoOccupy</RootNamespace>
+    <AssemblyName>NoOccupy</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon Condition="Exists('app.ico')">app.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Product>瑙ｉ櫎鍗犵敤</Product>
+    <Company>NoOccupy</Company>
+    <Description>涓€閿В闄ゆ枃浠舵垨鏂囦欢澶硅绋嬪簭鍗犵敤</Description>
+    <Copyright>Copyright 漏 2026</Copyright>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj-core\**;obj-ui\**;bin-core\**;bin-ui\**;obj\**;bin\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+
+</Project>
+

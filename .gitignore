@@ -1,0 +1,22 @@
+# 构建输出
+[Bb]in/
+[Oo]bj/
+bin-core/
+obj-core/
+bin-ui/
+obj-ui/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+
+# 测试临时文件
+tests/tmp/
+*.log
+
+# Windows
+Thumbs.db
+Desktop.ini

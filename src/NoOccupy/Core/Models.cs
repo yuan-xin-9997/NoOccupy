@@ -26,9 +26,9 @@ namespace NoOccupy.Core
             {
                 switch (Source)
                 {
-                    case LockSource.HandleScan: return "句柄扫描";
-                    case LockSource.ModuleScan: return "模块扫描";
-                    default: return "系统检测";
+                    case LockSource.HandleScan: return NoOccupy.L.T("句柄扫描");
+                    case LockSource.ModuleScan: return NoOccupy.L.T("模块扫描");
+                    default: return NoOccupy.L.T("系统检测");
                 }
             }
         }

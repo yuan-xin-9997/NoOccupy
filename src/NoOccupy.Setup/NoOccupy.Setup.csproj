@@ -11,9 +11,6 @@
     <AssemblyName>NoOccupy.Setup</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\NoOccupy\app.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Product>解除占用</Product>
     <Company>NoOccupy</Company>
     <Description>解除占用安装程序</Description>
@@ -25,6 +22,8 @@
 
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Compile Include="..\Shared\UiLanguage.cs" Link="Localization\UiLanguage.cs" />
+    <Compile Include="..\Shared\UiDialog.cs" Link="Localization\UiDialog.cs" />
     <EmbeddedResource Include="..\NoOccupy\bin\Release\net48\NoOccupy.exe" LogicalName="NoOccupy.exe" />
     <EmbeddedResource Include="..\NoOccupy\bin\Release\net48\NoOccupy.exe.config" LogicalName="NoOccupy.exe.config" />
   </ItemGroup>

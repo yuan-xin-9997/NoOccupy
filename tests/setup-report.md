@@ -1,4 +1,4 @@
-# 安装 / 卸载验收报告
+# 安装 / 卸载与四语言验收报告
 
 - 日期：2026-10-22
 - 系统：Windows 11 家庭中文版，Build 26300
@@ -11,165 +11,140 @@
 | 项目 | 值 |
 | --- | --- |
 | 安装包 | `E:\dev\NoOccupy\NoOccupy-Setup.exe` |
-| 大小 | 193,536 字节（189.0 KB） |
-| SHA256 | `AF34B1259C0F524E730B71CA6654BC382B3422282365CBA04EBC68078C74CFB9` |
-| 主程序 | 116,736 字节 |
+| 大小 | 239,616 字节（234.0 KB） |
+| SHA256 | `B3B927762440D1C13E310FC90B6BD68AF9679190BE98C77A4A067B0DFF9EC78B` |
+| 主程序 | 146,432 字节 |
+| 主程序 SHA256 | `7F9C6961C2F199E8393BF3546E2E52056CB611E669F3F4732A3EEF9CD1A3E6DD` |
 | 安装包内卸载器 | 与安装包同一文件，复制为 `NoOccupyUninstall.exe` |
 
-最终 SHA256：
+最终安装目录中的 `NoOccupyUninstall.exe` 与根目录安装包 SHA256 一致，说明已安装的是当前构建产物。
+
+## 2. 四语言主界面
+
+主界面右上角新增“界面语言”下拉框，支持中文、English、日本語、한국어。切换后标题、副标题、按钮、列头、右键菜单、空状态/无效路径状态和结果提示立即刷新，并重新扫描当前目标。
+
+| 语言 | 截图 | 验证内容 |
+| --- | --- | --- |
+| 中文 | `tests/l10n-zh.png` | 1 个占用进程，路径/来源/按钮完整 |
+| English | `tests/l10n-en.png` | “Release Lock”，列头与底部按钮完整 |
+| 日本語 | `tests/l10n-ja.png` | 路径按钮、来源列“ハンドルスキャン”完整 |
+| 한국어 | `tests/l10n-ko.png` | 标题、状态、路径按钮、列头完整 |
+
+150% DPI 下修复了两个实际截断问题：
+
+- 路径行按钮加宽到 136 / 156，日文“ファイルを選択…”和“フォルダーを選択…”完整显示。
+- “来源”列加宽到 120，日文“ハンドルスキャン”不再显示为“ハンドルス…”。
+
+启动时焦点移到“选择文件”按钮，避免语言下拉框获得焦点后把当前语言显示成蓝色选中状态。
+
+空状态和无效路径状态也按语言刷新；例如韩文空状态、日文无效路径均通过截图确认。
+
+## 3. 安装器四语言
+
+安装器顶部同样提供语言下拉框，安装器会读取/写入同一个 HKCU 设置，安装后的主程序直接沿用。
+
+| 语言 | 截图 |
+| --- | --- |
+| 中文 | `tests/l10n-setup-zh.png` |
+| English | `tests/l10n-setup-en.png` |
+| 日本語 | `tests/l10n-setup-ja.png` |
+| 한국어 | `tests/l10n-setup-ko.png` |
+
+日文说明文字原先在 150% DPI 下换成三行，已缩短为：
 
 ```text
-AF34B1259C0F524E730B71CA6654BC382B3422282365CBA04EBC68078C74CFB9
+インストール後、ファイルとフォルダーの右クリックメニューに追加されます。
+Windows 11 では「その他のオプションを表示」から開けます。
 ```
 
-主程序 SHA256：
+日文安装成功提示也使用自绘对话框，按钮为 `OK`，见 `tests/l10n-setup-success-ja.png`。
 
-```text
-25E3620BB36E0418ECF19731A2F3DFFDC97EA7403F36497B6284899970F80E8E
-```
+## 4. 自绘对话框
 
-## 2. 安装器界面（150% DPI）
+系统 `MessageBox` 的“是/否/确定”按钮跟随 Windows 显示语言，在中文系统上即使软件切换为英文/日文，按钮仍会显示中文。为消除这一问题，主程序和安装器改用共享的 `UiDialog`：
 
-- 窗口实际尺寸 1162 × 836，布局完整，没有按钮或中文被截断。
-- 默认安装目录为 `C:\Program Files\NoOccupy`。
-- 安装按钮、取消按钮、路径输入框、说明文字和内容卡片均正常显示。
-- 截图：`tests/setup-ui-new.png`
+- Info / Warning / Error / Confirm 四种类型；
+- 按钮文字来自当前语言的翻译表；
+- 确认框默认选中“否/No”，避免误结束进程；
+- 对话框居中于主窗口，并限制在屏幕工作区内。
 
-修复记录：安装器原先使用像素字体，手动调用 `Scale()` 只缩放控件边界、不缩放字体，导致 150% 下文字偏小、信息卡片与页脚重叠。现在的实现会在缩放边界后同步按比例缩放字体，并限制说明文字宽度、压缩卡片高度。
+验证截图：
 
-## 3. 图形界面安装
+- 中文结束进程确认框：`tests/l10n-dialog-zh.png`
+- 中文操作完成提示：`tests/l10n-result-zh.png`
+- 日文卸载确认框（“はい / いいえ”）：`tests/l10n-uninstall-ja.png`
 
-使用 `tests/setup-ui-install.ps1` 启动安装器、点击“安装”、关闭成功提示：
+## 5. 安装 / 卸载验收
 
-- 安装器进程退出码：`0`
-- 安装成功提示出现并正常关闭
-- 安装结果：`installed=True`
+### 5.1 英文安装
 
-## 4. 静默安装与注册表验收
+使用安装器英文界面安装到 `C:\Program Files\NoOccupy`：
 
-执行：
+- 三处右键菜单显示名均为 `Release Lock`；
+- 开始菜单快捷方式：`NoOccupy.lnk`；
+- 旧版 `解除占用.lnk` 被自动清理；
+- ARP 显示名：`Release Lock (NoOccupy)`；
+- 已安装主程序启动后显示英文界面。
 
-```powershell
-NoOccupy-Setup.exe /S
-```
+### 5.2 日文卸载
 
-退出码 `0`。默认安装目录内容：
+使用新构建的卸载器，在 HKCU 为 `ja-JP` 时直接运行：
 
-```text
-NoOccupy.exe           116,736 字节
-NoOccupy.exe.config        414 字节
-NoOccupyUninstall.exe  193,536 字节
-```
+- 显示日文自绘确认框，按钮为“はい / いいえ”；
+- 选择“はい”后卸载完成；
+- 程序目录、三处右键菜单、ARP 卸载项和 `NoOccupy.lnk` 全部删除；
+- 无临时卸载器残留。
 
-已安装并验证：
+### 5.3 最终中文安装
 
-- 右键菜单键 `HKLM\Software\Classes\*\shell\NoOccupy`
-  - 默认值：`解除占用`
-  - `Icon`：`"C:\Program Files\NoOccupy\NoOccupy.exe",0`
-  - `Position`：`top`
-  - `MultiSelectModel`：`Single`
-  - `command`：`"C:\Program Files\NoOccupy\NoOccupy.exe" "%1"`
-- 文件夹菜单键 `HKLM\Software\Classes\Directory\shell\NoOccupy`，command 同上
-- 文件夹空白处菜单键 `HKLM\Software\Classes\Directory\Background\shell\NoOccupy`，command 使用 `"%V"`
-- 开始菜单快捷方式：`C:\ProgramData\Microsoft\Windows\Start Menu\Programs\解除占用.lnk`
-- 系统卸载项：`HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\NoOccupy`
-  - 显示名称：`解除占用 (NoOccupy)`
-  - 版本：`1.0.0`
-  - `UninstallString`：`"...\NoOccupyUninstall.exe" /uninstall`
-  - `QuietUninstallString`：`"...\NoOccupyUninstall.exe" /S /uninstall`
-  - `EstimatedSize`：约 300 KB
+最后恢复 `HKCU\Software\NoOccupy\Language = zh-CN`，使用根目录 `NoOccupy-Setup.exe /S` 重新安装，保持“已安装”状态：
 
-静默安装默认不创建桌面快捷方式，与安装器默认状态一致。
+| 检查项 | 结果 |
+| --- | --- |
+| `C:\Program Files\NoOccupy\NoOccupy.exe` | 146,432 字节，哈希匹配当前构建 |
+| `NoOccupyUninstall.exe` | 239,616 字节，哈希匹配根目录安装包 |
+| `HKLM\...\*\shell\NoOccupy` | `解除占用` |
+| `HKLM\...\Directory\shell\NoOccupy` | `解除占用` |
+| `HKLM\...\Directory\Background\shell\NoOccupy` | `解除占用` |
+| 开始菜单 | `NoOccupy.lnk` |
+| ARP 显示名 | `解除占用 (NoOccupy)` |
+| HKCU 语言 | `zh-CN` |
 
-## 5. 主程序功能验收
+## 6. 主程序功能验收（最终中文安装）
 
 用 PowerShell 进程以独占方式锁定测试文件，再启动已安装的主程序：
 
 ```powershell
-"C:\Program Files\NoOccupy\NoOccupy.exe" "E:\...\locked-final.txt"
+"C:\Program Files\NoOccupy\NoOccupy.exe" "E:\...\locked.txt"
 ```
 
-结果：
+- 界面显示“发现 1 个占用进程”；
+- 进程名：`powershell.exe`；
+- PID：`83440`；
+- 来源：`句柄扫描`；
+- 勾选进程后点击“结束选中进程”；
+- 自绘确认框显示中文，选择“是”；
+- 结果提示：`成功 1 个 / 失败 0 个。`；
+- 锁定进程被结束，状态变为“未发现占用进程，当前可以正常删除/移动”。
 
-- 界面显示“发现 1 个占用进程”
-- 进程名：`powershell.exe`
-- PID：`30400`
-- 来源：`句柄扫描`
-- 程序路径列显示 `C:\Windows\System32\WindowsPowerShell\v1.0\...`
-- 截图：`tests/ui-installed-final.png`
-
-命令行复验（安装目录中的 exe）：
-
-```text
-scanExit=0
-count=1
-pid=31044
-name=powershell.exe
-source=HandleScan
-```
-
-图形界面结束进程验收（`tests/ui-kill6.ps1`）：
-
-- 鼠标勾选进程行
-- 点击“结束选中进程”
-- 确认框选择“是”
-- 占用进程 `powershell.exe` 被结束
-- 结果提示：`成功 1 个 / 失败 0 个`
-- 随后测试文件删除成功：`delete=OK`
-
-## 6. 卸载验收
-
-执行安装目录中的：
-
-```powershell
-"C:\Program Files\NoOccupy\NoOccupyUninstall.exe" /S /uninstall
-```
-
-- 卸载器退出码：`0`
-- 原安装器把自身复制到 `%TEMP%\NoOccupyUninstall_<pid>.exe`
-- 临时卸载器删除安装目录后，再通过延迟命令删除自身
-
-另验证了直接执行 `NoOccupyUninstall.exe /S`（不带 `/uninstall`）也能正确卸载：程序会根据文件名自动进入卸载流程。直接双击该文件时会显示卸载确认框。
-
-验收结果：
-
-| 检查项 | 结果 |
-| --- | --- |
-| `C:\Program Files\NoOccupy` | 已删除 |
-| `HKLM\...\*\shell\NoOccupy` | 已删除 |
-| `HKLM\...\Directory\shell\NoOccupy` | 已删除 |
-| `HKLM\...\Directory\Background\shell\NoOccupy` | 已删除 |
-| ARP 卸载项 | 已删除 |
-| 开始菜单快捷方式 | 已删除 |
-| `%TEMP%\NoOccupyUninstall_*.exe` | 无残留 |
-
-## 7. 最终状态
-
-卸载完成后再次执行 `NoOccupy-Setup.exe /S`：
-
-- 退出码 `0`
-- 程序重新安装到默认目录
-- 右键菜单、开始菜单、ARP 卸载项均已恢复
-- 最终保持“已安装”状态
-
-最终安装包位于：
-
-```text
-E:\dev\NoOccupy\NoOccupy-Setup.exe
-```
-
-## 8. 已知限制
+## 7. 已知限制
 
 Windows 11 默认右键菜单只展示打包应用（MSIX/COM）注册的项。本项目使用兼容 Windows 10/11 的 `HKLM\Software\Classes\...\shell` 传统注册方式，因此在 Windows 11 上需要点击“显示更多选项”，或直接按 `Shift + F10`。Windows 10 上会直接出现在右键菜单中。
 
 这是 Windows 11 的菜单机制限制；若必须显示在一级菜单，需要额外制作 MSIX 包并实现 `IExplorerCommand`，会显著增加安装包体积和签名/部署复杂度。
 
-## 9. 测试脚本
+命令行接口的输出固定为中文，以保证自动化脚本稳定；图形界面、安装器和自绘对话框均支持四语言。
 
-- `tests/setup-ui-install.ps1`：启动安装器、点击安装、关闭提示并检查结果
-- `tests/ui-kill6.ps1`：勾选进程、点击结束、确认并检查文件是否可删除
-- `tests/lock-helper.ps1`：在后台以独占方式锁定测试文件
-- `tests/capture-screen.ps1`：按窗口矩形截图（DPI 感知）
-- `tests/capture-window.ps1`：PrintWindow 截图备用
+## 8. 测试脚本
 
-测试脚本按本机 150% DPI 的控件坐标编写，换机器运行前需要重新校准坐标。
+- `tests/check-l10n.py`：检查主程序翻译表是否缺失/重复键。
+- `tests/check-setup-l10n.py`：检查安装器翻译表是否缺失/重复键。
+- `tests/switch-language.ps1`：通过界面切换语言并验证 HKCU 持久化。
+- `tests/lock-helper.ps1`：在后台以独占方式锁定测试文件。
+- `tests/capture-screen.ps1`：按窗口矩形截图（DPI 感知）。
+- `tests/capture-window.ps1`：PrintWindow 截图备用。
+- `tests/capture-uia-window.ps1`：按 UI Automation 窗口矩形截图。
+- `tests/child-windows.ps1`、`tests/find-windows.ps1`：定位对话框/按钮句柄，用于自绘对话框验收。
+- `tests/setup-ui-install.ps1`、`tests/ui-kill6.ps1`：旧版中文安装/结束进程自动化脚本。
+
+测试脚本中的鼠标坐标按本机 150% DPI 校准，换机器运行前需要重新校准。

@@ -22,6 +22,15 @@ if (-not (Test-Path $setupSource)) { throw "安装程序产物不存在：$setup
 $target = "$root\NoOccupy-Setup.exe"
 Copy-Item $setupSource $target -Force
 
+$dist = Join-Path $root 'dist'
+New-Item -ItemType Directory -Path $dist -Force | Out-Null
+Copy-Item $target (Join-Path $dist 'NoOccupy-Setup.exe') -Force
+$checksum = (Get-FileHash $target -Algorithm SHA256).Hash.ToLowerInvariant()
+[System.IO.File]::WriteAllText(
+    (Join-Path $dist 'SHA256SUMS.txt'),
+    "$checksum  NoOccupy-Setup.exe`n",
+    [System.Text.UTF8Encoding]::new($false))
+
 Write-Host '=== 3/3 完成 ==='
 $hash = Get-FileHash $target -Algorithm SHA256
 $size = (Get-Item $target).Length

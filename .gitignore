@@ -5,6 +5,7 @@ bin-core/
 obj-core/
 bin-ui/
 obj-ui/
+dist/
 
 # Visual Studio / Rider
 .vs/

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using NoOccupy.Localization;
 
 namespace NoOccupy
 {
@@ -25,11 +26,11 @@ namespace NoOccupy
             Application.ThreadException += delegate(object sender, System.Threading.ThreadExceptionEventArgs e)
             {
                 LogException(e.Exception);
-                MessageBox.Show(
-                    "程序遇到错误：" + (e.Exception == null ? "未知错误" : e.Exception.Message),
-                    "解除占用",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                UiDialog.Error(
+                    null,
+                    L.T("解除占用"),
+                    L.T("程序遇到错误：") + (e.Exception == null ? L.T("未知错误") : e.Exception.Message),
+                    L.T("确定"));
             };
             AppDomain.CurrentDomain.UnhandledException += delegate(object sender, UnhandledExceptionEventArgs e)
             {

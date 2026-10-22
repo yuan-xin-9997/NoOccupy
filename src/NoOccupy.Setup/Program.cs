@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using NoOccupy.Localization;
 
 namespace NoOccupy.Setup
 {
@@ -16,11 +17,11 @@ namespace NoOccupy.Setup
             Application.ThreadException += delegate(object sender, System.Threading.ThreadExceptionEventArgs e)
             {
                 InstallerEngine.Log("未处理异常：" + e.Exception);
-                MessageBox.Show(
-                    "程序遇到错误：" + (e.Exception == null ? "未知错误" : e.Exception.Message),
-                    "解除占用 安装程序",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                UiDialog.Error(
+                    null,
+                    S.T("解除占用 安装程序"),
+                    S.T("程序遇到错误：") + (e.Exception == null ? S.T("未知错误") : e.Exception.Message),
+                    S.T("确定"));
             };
 
             SetupOptions options = SetupOptions.Parse(args);
@@ -39,14 +40,13 @@ namespace NoOccupy.Setup
             {
                 if (!options.Silent)
                 {
-                    DialogResult answer = MessageBox.Show(
-                        "确定要卸载“解除占用”吗？\r\n\r\n将删除程序文件、右键菜单和快捷方式。",
-                        "卸载解除占用",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question,
-                        MessageBoxDefaultButton.Button2);
-
-                    if (answer != DialogResult.Yes)
+                    if (!UiDialog.Confirm(
+                        null,
+                        S.T("卸载解除占用"),
+                        S.T("确定要卸载“解除占用”吗？\r\n\r\n将删除程序文件、右键菜单和快捷方式。"),
+                        S.T("是"),
+                        S.T("否"),
+                        false))
                     {
                         return 0;
                     }
@@ -62,11 +62,11 @@ namespace NoOccupy.Setup
                     InstallerEngine.Log("卸载失败：" + ex);
                     if (!options.Silent)
                     {
-                        MessageBox.Show(
-                            "卸载失败：" + ex.Message + "\r\n\r\n日志：" + InstallerEngine.LogPath,
-                            "解除占用",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Error);
+                        UiDialog.Error(
+                            null,
+                            S.T("解除占用"),
+                            S.T("卸载失败：") + ex.Message + "\r\n\r\n" + S.T("日志：") + InstallerEngine.LogPath,
+                            S.T("确定"));
                     }
                     return 1;
                 }

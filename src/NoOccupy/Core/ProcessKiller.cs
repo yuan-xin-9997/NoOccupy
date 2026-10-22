@@ -11,7 +11,10 @@ namespace NoOccupy.Core
     /// </summary>
     public static class ProcessKiller
     {
-        private const string CriticalMessage = "系统关键进程，已阻止结束";
+        private static string CriticalMessage
+        {
+            get { return L.T("系统关键进程，已阻止结束"); }
+        }
 
         public static KillResult Kill(IEnumerable<int> pids, IProgress<string> progress)
         {
@@ -68,7 +71,7 @@ namespace NoOccupy.Core
             if (pid <= 0)
             {
                 outcome.Name = "PID " + pid;
-                outcome.Error = "无效的进程 ID";
+                outcome.Error = L.T("无效的进程 ID");
                 return outcome;
             }
 
@@ -82,7 +85,7 @@ namespace NoOccupy.Core
             if (pid == selfPid)
             {
                 outcome.Name = ProcessUtil.GetProcessName(pid, null);
-                outcome.Error = "不能结束当前程序自身进程";
+                outcome.Error = L.T("不能结束当前程序自身进程");
                 return outcome;
             }
 
@@ -107,18 +110,18 @@ namespace NoOccupy.Core
                 }
 
                 Report(progress, string.Format(
-                    "正在结束 {0} (PID {1})...", outcome.Name, pid));
+                    L.T("正在结束 {0} (PID {1})..."), outcome.Name, pid));
 
                 process.Kill();
                 if (!process.WaitForExit(3000))
                 {
-                    outcome.Error = "结束进程超时（3 秒），进程可能受保护";
+                    outcome.Error = L.T("结束进程超时（3 秒），进程可能受保护");
                     return outcome;
                 }
 
                 outcome.Success = true;
                 Report(progress, string.Format(
-                    "已结束 {0} (PID {1})", outcome.Name, pid));
+                    L.T("已结束 {0} (PID {1})"), outcome.Name, pid));
             }
             catch (ArgumentException)
             {
@@ -135,16 +138,16 @@ namespace NoOccupy.Core
             {
                 if (ex.NativeErrorCode == 5)
                 {
-                    outcome.Error = "拒绝访问：权限不足或进程受保护";
+                    outcome.Error = L.T("拒绝访问：权限不足或进程受保护");
                 }
                 else
                 {
-                    outcome.Error = "结束进程失败：" + ex.Message;
+                    outcome.Error = L.T("结束进程失败：") + ex.Message;
                 }
             }
             catch (Exception ex)
             {
-                outcome.Error = "结束进程失败：" + ex.Message;
+                outcome.Error = L.T("结束进程失败：") + ex.Message;
             }
             finally
             {

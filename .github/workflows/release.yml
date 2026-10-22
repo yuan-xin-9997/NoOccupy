@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    name: Build and release Windows installer
+    runs-on: windows-2022
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Validate release version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $version = ([xml](Get-Content Directory.Build.props -Raw)).Project.PropertyGroup.Version
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid version: $version" }
+          if ($env:GITHUB_EVENT_NAME -eq 'push' -and $env:RELEASE_TAG -cne "v$version") {
+            throw "Tag $env:RELEASE_TAG does not match Directory.Build.props (v$version)"
+          }
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build installer
+        run: ./scripts/build.ps1
+
+      - name: Verify release payload
+        run: ./scripts/test-release.ps1
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: NoOccupy-Windows
+          path: |
+            dist/NoOccupy-Setup.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $notes = @'
+          ## Download / 下载
+
+          Download **NoOccupy-Setup.exe** below to install on Windows 10/11 (64-bit).
+          下载下方的 **NoOccupy-Setup.exe**，适用于 Windows 10/11（64 位）。
+
+          - Requires .NET Framework 4.8 or later and administrator permission.
+          - 支持中文、English、日本語、한국어；安装时需管理员权限。
+          - SHA256SUMS.txt contains the SHA-256 checksum of the installer.
+          - On Windows 11, use **Show more options** in the context menu.
+
+          See README.md, README.cn.md and CHANGELOG.md for details.
+          '@
+          $notes | Set-Content release-notes.md -Encoding utf8
+          gh release create $env:RELEASE_TAG dist/NoOccupy-Setup.exe dist/SHA256SUMS.txt `
+            --verify-tag --title "NoOccupy $env:RELEASE_TAG" --notes-file release-notes.md --generate-notes --latest
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub Release publication failed' }

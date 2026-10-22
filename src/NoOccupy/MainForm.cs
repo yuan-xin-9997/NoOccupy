@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using NoOccupy.Core;
+using NoOccupy.Localization;
 
 namespace NoOccupy
 {
@@ -52,6 +53,11 @@ namespace NoOccupy
         private List<LockingProcess> _processes = new List<LockingProcess>();
 
         private Panel _header;
+        private Label _titleLabel;
+        private Label _subtitleLabel;
+        private Label _languageLabel;
+        private ComboBox _languageCombo;
+        private bool _suppressLanguageChange;
         private PathDisplay _pathDisplay;
         private Button _chooseFileButton;
         private Button _chooseFolderButton;
@@ -100,7 +106,7 @@ namespace NoOccupy
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             AutoScaleMode = AutoScaleMode.None;
 
-            Text = "解除占用";
+            Text = L.T("解除占用");
             ClientSize = new Size(820, 560);
             MinimumSize = new Size(720, 480);
             StartPosition = FormStartPosition.CenterScreen;
@@ -152,6 +158,16 @@ namespace NoOccupy
             }
 
             ResizeColumns();
+
+            try
+            {
+                // 避免启动时语言下拉框获得焦点并高亮当前语言。
+                _chooseFileButton.Focus();
+            }
+            catch
+            {
+                // 忽略焦点设置异常。
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -262,13 +278,14 @@ namespace NoOccupy
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.Transparent,
-                ColumnCount = 2,
+                ColumnCount = 3,
                 RowCount = 3,
                 Margin = new Padding(0),
                 Padding = new Padding(0)
             };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 60F));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150F));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 8F));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
@@ -295,27 +312,70 @@ namespace NoOccupy
                 Padding = new Padding(0)
             };
 
-            var titleLabel = new Label
+            _titleLabel = new Label
             {
-                Text = "解除占用",
+                Text = L.T("解除占用"),
                 Font = new Font("Segoe UI", 20F, FontStyle.Bold, GraphicsUnit.Point),
                 ForeColor = UiTheme.Text,
                 AutoSize = true,
                 Margin = new Padding(0, 0, 0, 1),
                 UseMnemonic = false
             };
-            var subtitleLabel = new Label
+            _subtitleLabel = new Label
             {
-                Text = "检测并结束正在占用此文件或文件夹的进程",
+                Text = L.T("检测并结束正在占用此文件或文件夹的进程"),
                 Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point),
                 ForeColor = UiTheme.Muted,
                 AutoSize = true,
                 Margin = new Padding(2, 0, 0, 0),
                 UseMnemonic = false
             };
-            titleStack.Controls.Add(titleLabel);
-            titleStack.Controls.Add(subtitleLabel);
+            titleStack.Controls.Add(_titleLabel);
+            titleStack.Controls.Add(_subtitleLabel);
             layout.Controls.Add(titleStack, 1, 0);
+
+            var languagePanel = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent,
+                ColumnCount = 1,
+                RowCount = 2,
+                Margin = new Padding(10, 2, 0, 0),
+                Padding = new Padding(0)
+            };
+            languagePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            languagePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 17F));
+            languagePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
+
+            _languageLabel = new Label
+            {
+                Text = L.T("界面语言"),
+                Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point),
+                ForeColor = UiTheme.Muted,
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleRight,
+                AutoEllipsis = true,
+                Margin = new Padding(0),
+                UseMnemonic = false
+            };
+
+            _languageCombo = new ComboBox
+            {
+                Dock = DockStyle.Fill,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point),
+                Margin = new Padding(0, 2, 0, 0),
+                TabStop = true
+            };
+            _languageCombo.Items.AddRange(LanguageSettings.NativeNames);
+            _languageCombo.SelectedIndex = (int)L.Language;
+            _languageCombo.SelectionChangeCommitted += OnLanguageChanged;
+            _toolTip.SetToolTip(_languageCombo, L.T("切换界面语言"));
+
+            languagePanel.Controls.Add(_languageLabel, 0, 0);
+            languagePanel.Controls.Add(_languageCombo, 0, 1);
+            layout.Controls.Add(languagePanel, 2, 0);
 
             var pathRow = new TableLayoutPanel
             {
@@ -327,8 +387,8 @@ namespace NoOccupy
                 Padding = new Padding(0)
             };
             pathRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            pathRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 108F));
-            pathRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 124F));
+            pathRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 136F));
+            pathRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 156F));
             pathRow.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
             _pathDisplay = new PathDisplay
@@ -336,18 +396,18 @@ namespace NoOccupy
                 Dock = DockStyle.Fill,
                 Margin = new Padding(0, 1, 10, 1),
                 Font = Font,
-                Text = "尚未选择文件或文件夹",
+                Text = L.T("尚未选择文件或文件夹"),
                 ForeColor = UiTheme.DisabledText,
                 BackColor = UiTheme.Card
             };
             _toolTip.SetToolTip(_pathDisplay, string.Empty);
 
-            _chooseFileButton = CreateSecondaryButton("选择文件…");
+            _chooseFileButton = CreateSecondaryButton(L.T("选择文件…"));
             _chooseFileButton.Dock = DockStyle.Fill;
             _chooseFileButton.Margin = new Padding(0, 1, 8, 1);
             _chooseFileButton.Click += OnChooseFile;
 
-            _chooseFolderButton = CreateSecondaryButton("选择文件夹…");
+            _chooseFolderButton = CreateSecondaryButton(L.T("选择文件夹…"));
             _chooseFolderButton.Dock = DockStyle.Fill;
             _chooseFolderButton.Margin = new Padding(0, 1, 0, 1);
             _chooseFolderButton.Click += OnChooseFolder;
@@ -357,7 +417,7 @@ namespace NoOccupy
             pathRow.Controls.Add(_chooseFolderButton, 2, 0);
 
             layout.Controls.Add(pathRow, 0, 2);
-            layout.SetColumnSpan(pathRow, 2);
+            layout.SetColumnSpan(pathRow, 3);
 
             _header.Controls.Add(layout);
             _header.Paint += OnHeaderPaint;
@@ -397,7 +457,7 @@ namespace NoOccupy
                 Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point),
                 ForeColor = UiTheme.Text,
                 Margin = new Padding(0),
-                Text = "准备就绪"
+                Text = L.T("准备就绪")
             };
 
             _statusDetail = new Label
@@ -464,11 +524,11 @@ namespace NoOccupy
                 Visible = false
             };
 
-            _listView.Columns.Add("进程名称", 200, HorizontalAlignment.Left);
+            _listView.Columns.Add(L.T("进程名称"), 200, HorizontalAlignment.Left);
             _listView.Columns.Add("PID", 70, HorizontalAlignment.Right);
-            _listView.Columns.Add("程序路径", 360, HorizontalAlignment.Left);
-            _listView.Columns.Add("来源", 90, HorizontalAlignment.Left);
-            _listView.Columns.Add("服务", 110, HorizontalAlignment.Left);
+            _listView.Columns.Add(L.T("程序路径"), 360, HorizontalAlignment.Left);
+            _listView.Columns.Add(L.T("来源"), 120, HorizontalAlignment.Left);
+            _listView.Columns.Add(L.T("服务"), 110, HorizontalAlignment.Left);
 
             _listView.ItemCheck += OnListItemCheck;
             _listView.ItemChecked += OnListItemChecked;
@@ -476,8 +536,8 @@ namespace NoOccupy
             _listView.Resize += OnListResize;
 
             _contextMenu = new ContextMenuStrip();
-            _killOneMenu = new ToolStripMenuItem("结束该进程");
-            _locateMenu = new ToolStripMenuItem("打开文件位置");
+            _killOneMenu = new ToolStripMenuItem(L.T("结束该进程"));
+            _locateMenu = new ToolStripMenuItem(L.T("打开文件位置"));
             _killOneMenu.Click += OnKillOneProcess;
             _locateMenu.Click += OnLocateProcess;
             _contextMenu.Items.Add(_killOneMenu);
@@ -543,7 +603,7 @@ namespace NoOccupy
 
             _emptyTitle = new Label
             {
-                Text = "请选择一个文件或文件夹开始检测",
+                Text = L.T("请选择一个文件或文件夹开始检测"),
                 Font = new Font("Segoe UI", 13F, FontStyle.Bold, GraphicsUnit.Point),
                 ForeColor = UiTheme.Text,
                 AutoSize = true,
@@ -556,7 +616,7 @@ namespace NoOccupy
 
             _emptySubtitle = new Label
             {
-                Text = "支持检测文件或整个文件夹被哪些程序占用",
+                Text = L.T("支持检测文件或整个文件夹被哪些程序占用"),
                 Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point),
                 ForeColor = UiTheme.Muted,
                 AutoSize = true,
@@ -578,12 +638,12 @@ namespace NoOccupy
                 Margin = new Padding(0)
             };
 
-            _emptyChooseFileButton = CreatePrimaryButton("选择文件…");
+            _emptyChooseFileButton = CreatePrimaryButton(L.T("选择文件…"));
             _emptyChooseFileButton.Size = new Size(128, 36);
             _emptyChooseFileButton.Margin = new Padding(0, 0, 10, 0);
             _emptyChooseFileButton.Click += OnChooseFile;
 
-            _emptyChooseFolderButton = CreateSecondaryButton("选择文件夹…");
+            _emptyChooseFolderButton = CreateSecondaryButton(L.T("选择文件夹…"));
             _emptyChooseFolderButton.Size = new Size(136, 36);
             _emptyChooseFolderButton.Margin = new Padding(0);
             _emptyChooseFolderButton.Click += OnChooseFolder;
@@ -616,29 +676,29 @@ namespace NoOccupy
                 Padding = new Padding(20, 15, 20, 15),
                 Margin = new Padding(0)
             };
-            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 72F));
-            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 82F));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100F));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120F));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 82F));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140F));
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
-            _selectAllButton = CreateSecondaryButton("全选");
+            _selectAllButton = CreateSecondaryButton(L.T("全选"));
             _selectAllButton.Dock = DockStyle.Fill;
             _selectAllButton.Margin = new Padding(0, 0, 8, 0);
             _selectAllButton.Click += OnSelectAll;
 
-            _selectNoneButton = CreateSecondaryButton("全不选");
+            _selectNoneButton = CreateSecondaryButton(L.T("全不选"));
             _selectNoneButton.Dock = DockStyle.Fill;
             _selectNoneButton.Margin = new Padding(0, 0, 8, 0);
             _selectNoneButton.Click += OnSelectNone;
 
-            _refreshButton = CreateSecondaryButton("刷新");
+            _refreshButton = CreateSecondaryButton(L.T("刷新"));
             _refreshButton.Dock = DockStyle.Fill;
             _refreshButton.Margin = new Padding(0, 0, 8, 0);
             _refreshButton.Click += OnRefresh;
 
-            _killButton = CreatePrimaryButton("结束选中进程");
+            _killButton = CreatePrimaryButton(L.T("结束选中进程"));
             _killButton.Dock = DockStyle.Fill;
             _killButton.Margin = new Padding(0);
             _killButton.Click += OnKillSelected;
@@ -797,7 +857,7 @@ namespace NoOccupy
                 _isScanning = true;
                 _isKilling = false;
 
-                SetStatus("正在检测占用进程…", UiTheme.Primary, string.Empty);
+                SetStatus(L.T("正在检测占用进程…"), UiTheme.Primary, string.Empty);
                 _marquee.Visible = true;
                 _marquee.StartAnimation();
                 UpdateUiState();
@@ -829,7 +889,7 @@ namespace NoOccupy
             {
                 if (!_closing && !IsDisposed && version == _scanVersion)
                 {
-                    SetStatus("已取消检测", UiTheme.Muted, string.Empty);
+                    SetStatus(L.T("已取消检测"), UiTheme.Muted, string.Empty);
                 }
             }
             catch (Exception ex)
@@ -855,7 +915,7 @@ namespace NoOccupy
         {
             if (result == null)
             {
-                throw new InvalidOperationException("检测没有返回结果。");
+                throw new InvalidOperationException(L.T("检测没有返回结果。"));
             }
 
             _processes = MergeAndSort(result.Processes);
@@ -865,11 +925,11 @@ namespace NoOccupy
 
             if (_processes.Count == 0)
             {
-                SetStatus("未发现占用进程，当前可以正常删除/移动", UiTheme.Success, detail);
+                SetStatus(L.T("未发现占用进程，当前可以正常删除/移动"), UiTheme.Success, detail);
             }
             else
             {
-                SetStatus(string.Format("发现 {0} 个占用进程", _processes.Count), UiTheme.Warning, detail);
+                SetStatus(L.T("发现 {0} 个占用进程", _processes.Count), UiTheme.Warning, detail);
             }
 
             if (result.Warnings != null && result.Warnings.Count > 0)
@@ -885,21 +945,21 @@ namespace NoOccupy
 
             if (result.IsDirectory)
             {
-                parts.Add(string.Format("已扫描 {0:N0} 个文件", result.ScannedFiles));
+                parts.Add(string.Format(L.T("已扫描 {0:N0} 个文件"), result.ScannedFiles));
             }
 
             if (result.ElapsedMs >= 1000)
             {
-                parts.Add(string.Format("耗时 {0:0.0} 秒", result.ElapsedMs / 1000.0));
+                parts.Add(string.Format(L.T("耗时 {0:0.0} 秒"), result.ElapsedMs / 1000.0));
             }
             else
             {
-                parts.Add(string.Format("耗时 {0} ms", result.ElapsedMs));
+                parts.Add(string.Format(L.T("耗时 {0} ms"), result.ElapsedMs));
             }
 
             if (result.Warnings != null && result.Warnings.Count > 0)
             {
-                parts.Add(string.Format("{0} 条警告", result.Warnings.Count));
+                parts.Add(string.Format(L.T("{0} 条警告"), result.Warnings.Count));
             }
 
             return string.Join(" · ", parts.ToArray());
@@ -979,12 +1039,12 @@ namespace NoOccupy
                     foreach (LockingProcess process in processes)
                     {
                         string name = string.IsNullOrWhiteSpace(process.Name)
-                            ? "（未知进程）"
+                            ? L.T("（未知进程）")
                             : process.Name;
 
                         if (process.IsCritical)
                         {
-                            name += "（系统关键）";
+                            name += L.T("（系统关键）");
                         }
 
                         var item = new ListViewItem(name);
@@ -997,17 +1057,17 @@ namespace NoOccupy
                         var tip = new StringBuilder();
                         if (process.IsCritical)
                         {
-                            tip.AppendLine("系统关键进程，不建议结束。");
+                            tip.AppendLine(L.T("系统关键进程，不建议结束。"));
                         }
 
                         tip.Append(string.IsNullOrWhiteSpace(process.ExecutablePath)
-                            ? "程序路径不可用"
+                            ? L.T("程序路径不可用")
                             : process.ExecutablePath);
 
                         if (!string.IsNullOrWhiteSpace(process.ServiceName))
                         {
                             tip.AppendLine();
-                            tip.Append("服务：").Append(process.ServiceName);
+                            tip.Append(L.T("服务：")).Append(process.ServiceName);
                         }
 
                         item.ToolTipText = tip.ToString();
@@ -1056,11 +1116,11 @@ namespace NoOccupy
             _processes = new List<LockingProcess>();
             ClearList();
 
-            _pathDisplay.Text = "尚未选择文件或文件夹";
+            _pathDisplay.Text = L.T("尚未选择文件或文件夹");
             _pathDisplay.ForeColor = UiTheme.DisabledText;
             _toolTip.SetToolTip(_pathDisplay, string.Empty);
 
-            _statusLabel.Text = "准备就绪，请选择要检测的目标";
+            _statusLabel.Text = L.T("准备就绪，请选择要检测的目标");
             _statusLabel.ForeColor = UiTheme.Muted;
             _statusDetail.Text = string.Empty;
             _statusDetail.ForeColor = UiTheme.Muted;
@@ -1069,9 +1129,9 @@ namespace NoOccupy
             _marquee.StopAnimation();
             _marquee.Visible = false;
 
-            _emptyTitle.Text = "请选择一个文件或文件夹开始检测";
+            _emptyTitle.Text = L.T("请选择一个文件或文件夹开始检测");
             _emptyTitle.ForeColor = UiTheme.Text;
-            _emptySubtitle.Text = "支持检测文件或整个文件夹被哪些程序占用";
+            _emptySubtitle.Text = L.T("支持检测文件或整个文件夹被哪些程序占用");
             _emptySubtitle.ForeColor = UiTheme.Muted;
 
             _listView.Visible = false;
@@ -1092,7 +1152,7 @@ namespace NoOccupy
             _pathDisplay.ForeColor = UiTheme.Muted;
             _toolTip.SetToolTip(_pathDisplay, path);
 
-            _statusLabel.Text = "路径不存在或无法访问";
+            _statusLabel.Text = L.T("路径不存在或无法访问");
             _statusLabel.ForeColor = UiTheme.Danger;
             _statusDetail.Text = string.Empty;
             _statusDetail.ForeColor = UiTheme.Muted;
@@ -1101,9 +1161,9 @@ namespace NoOccupy
             _marquee.StopAnimation();
             _marquee.Visible = false;
 
-            _emptyTitle.Text = "无法检测该路径";
+            _emptyTitle.Text = L.T("无法检测该路径");
             _emptyTitle.ForeColor = UiTheme.Text;
-            _emptySubtitle.Text = "路径不存在或无法访问，请重新选择目标。";
+            _emptySubtitle.Text = L.T("路径不存在或无法访问，请重新选择目标。");
             _emptySubtitle.ForeColor = UiTheme.Danger;
 
             _listView.Visible = false;
@@ -1119,13 +1179,13 @@ namespace NoOccupy
             _marquee.StopAnimation();
             _marquee.Visible = false;
 
-            string message = ex == null ? "未知错误" : ex.Message;
+            string message = ex == null ? L.T("未知错误") : ex.Message;
             if (string.IsNullOrWhiteSpace(message))
             {
                 message = ex.GetType().Name;
             }
 
-            SetStatus("检测失败：" + message, UiTheme.Danger, string.Empty);
+            SetStatus(L.T("检测失败：") + message, UiTheme.Danger, string.Empty);
             _emptyOverlay.Visible = false;
             _listView.Visible = true;
             ClearList();
@@ -1175,7 +1235,7 @@ namespace NoOccupy
 
             if (processes.Count == 0)
             {
-                ShowInformation("没有可结束的进程", "选中的行包含系统关键进程，已自动忽略。");
+                ShowInformation(L.T("没有可结束的进程"), L.T("选中的行包含系统关键进程，已自动忽略。"));
                 return;
             }
 
@@ -1183,28 +1243,26 @@ namespace NoOccupy
             if (processes.Count == 1)
             {
                 LockingProcess process = processes[0];
-                string name = string.IsNullOrWhiteSpace(process.Name) ? "未知进程" : process.Name;
-                message = string.Format(
+                string name = string.IsNullOrWhiteSpace(process.Name) ? L.T("未知进程") : process.Name;
+                message = L.T(
                     "确定要结束进程 “{0}”（PID {1}）吗？\r\n\r\n未保存的数据可能会丢失，此操作无法撤销。",
                     name,
                     process.Pid);
             }
             else
             {
-                message = string.Format(
+                message = L.T(
                     "确定要结束选中的 {0} 个进程吗？\r\n\r\n未保存的数据可能会丢失，此操作无法撤销。",
                     processes.Count);
             }
 
-            DialogResult answer = MessageBox.Show(
+            if (UiDialog.Confirm(
                 this,
+                L.T("结束进程"),
                 message,
-                "结束进程",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning,
-                MessageBoxDefaultButton.Button2);
-
-            if (answer == DialogResult.Yes)
+                L.T("是"),
+                L.T("否"),
+                false))
             {
                 KillProcessesAsync(processes);
             }
@@ -1219,7 +1277,7 @@ namespace NoOccupy
 
             int count = processes.Count;
             _isKilling = true;
-            SetStatus(string.Format("正在结束 {0} 个进程…", count), UiTheme.Primary, string.Empty);
+            SetStatus(L.T("正在结束 {0} 个进程…", count), UiTheme.Primary, string.Empty);
             _marquee.Visible = true;
             _marquee.StartAnimation();
             UpdateUiState();
@@ -1251,7 +1309,7 @@ namespace NoOccupy
                     }
                     else
                     {
-                        SetStatus("操作完成", UiTheme.Muted, string.Empty);
+                        SetStatus(L.T("操作完成"), UiTheme.Muted, string.Empty);
                     }
                 }
             }
@@ -1262,9 +1320,9 @@ namespace NoOccupy
                     _isKilling = false;
                     _marquee.StopAnimation();
                     _marquee.Visible = false;
-                    SetStatus("结束进程失败：" + ex.Message, UiTheme.Danger, string.Empty);
+                    SetStatus(L.T("结束进程失败：") + ex.Message, UiTheme.Danger, string.Empty);
                     UpdateUiState();
-                    ShowError("结束进程失败", ex.Message);
+                    ShowError(L.T("结束进程失败"), ex.Message);
                 }
             }
             finally
@@ -1288,13 +1346,13 @@ namespace NoOccupy
             int failed = result == null ? 0 : result.Failed;
 
             var message = new StringBuilder();
-            message.AppendFormat("成功 {0} 个 / 失败 {1} 个。", succeeded, failed);
+            message.AppendFormat(L.T("成功 {0} 个 / 失败 {1} 个。"), succeeded, failed);
 
             if (failed > 0 && result != null && result.Outcomes != null)
             {
                 message.AppendLine();
                 message.AppendLine();
-                message.AppendLine("失败摘要：");
+                message.AppendLine(L.T("失败摘要："));
 
                 List<KillOutcome> failures = result.Outcomes
                     .Where(o => o != null && !o.Success)
@@ -1303,8 +1361,8 @@ namespace NoOccupy
 
                 foreach (KillOutcome failure in failures)
                 {
-                    string name = string.IsNullOrWhiteSpace(failure.Name) ? "未知进程" : failure.Name;
-                    string error = string.IsNullOrWhiteSpace(failure.Error) ? "未知错误" : failure.Error;
+                    string name = string.IsNullOrWhiteSpace(failure.Name) ? L.T("未知进程") : failure.Name;
+                    string error = string.IsNullOrWhiteSpace(failure.Error) ? L.T("未知错误") : failure.Error;
                     error = error.Replace("\r", " ").Replace("\n", " ").Trim();
 
                     if (error.Length > 120)
@@ -1312,7 +1370,7 @@ namespace NoOccupy
                         error = error.Substring(0, 120) + "…";
                     }
 
-                    message.AppendFormat("• {0}（PID {1}）：{2}", name, failure.Pid, error);
+                    message.AppendFormat(L.T("• {0}（PID {1}）：{2}"), name, failure.Pid, error);
                     message.AppendLine();
                 }
 
@@ -1322,12 +1380,14 @@ namespace NoOccupy
                 }
             }
 
-            MessageBox.Show(
-                this,
-                message.ToString(),
-                failed == 0 ? "操作完成" : "部分进程未能结束",
-                MessageBoxButtons.OK,
-                failed == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+            if (failed == 0)
+            {
+                UiDialog.Info(this, L.T("操作完成"), message.ToString(), L.T("确定"));
+            }
+            else
+            {
+                UiDialog.Warning(this, L.T("部分进程未能结束"), message.ToString(), L.T("确定"));
+            }
         }
 
         #endregion
@@ -1340,11 +1400,11 @@ namespace NoOccupy
             {
                 using (var dialog = new OpenFileDialog
                 {
-                    Title = "选择要检测的文件",
+                    Title = L.T("选择要检测的文件"),
                     CheckFileExists = true,
                     Multiselect = false,
                     RestoreDirectory = true,
-                    Filter = "所有文件 (*.*)|*.*"
+                    Filter = L.T("所有文件 (*.*)|*.*")
                 })
                 {
                     if (dialog.ShowDialog(this) == DialogResult.OK)
@@ -1355,7 +1415,7 @@ namespace NoOccupy
             }
             catch (Exception ex)
             {
-                ShowError("无法选择文件", ex.Message);
+                ShowError(L.T("无法选择文件"), ex.Message);
             }
         }
 
@@ -1365,7 +1425,7 @@ namespace NoOccupy
             {
                 using (var dialog = new FolderBrowserDialog
                 {
-                    Description = "选择要检测的文件夹",
+                    Description = L.T("选择要检测的文件夹"),
                     ShowNewFolderButton = false
                 })
                 {
@@ -1382,7 +1442,7 @@ namespace NoOccupy
             }
             catch (Exception ex)
             {
-                ShowError("无法选择文件夹", ex.Message);
+                ShowError(L.T("无法选择文件夹"), ex.Message);
             }
         }
 
@@ -1424,7 +1484,7 @@ namespace NoOccupy
             }
             catch (Exception ex)
             {
-                ShowError("无法全选", ex.Message);
+                ShowError(L.T("无法全选"), ex.Message);
             }
             finally
             {
@@ -1451,7 +1511,7 @@ namespace NoOccupy
             }
             catch (Exception ex)
             {
-                ShowError("无法取消选择", ex.Message);
+                ShowError(L.T("无法取消选择"), ex.Message);
             }
             finally
             {
@@ -1473,7 +1533,7 @@ namespace NoOccupy
             }
             catch (Exception ex)
             {
-                ShowError("无法结束进程", ex.Message);
+                ShowError(L.T("无法结束进程"), ex.Message);
             }
         }
 
@@ -1489,7 +1549,7 @@ namespace NoOccupy
 
                 if (process.IsCritical)
                 {
-                    ShowInformation("系统关键进程", "该进程被标记为系统关键进程，不能从本工具结束。");
+                    ShowInformation(L.T("系统关键进程"), L.T("该进程被标记为系统关键进程，不能从本工具结束。"));
                     return;
                 }
 
@@ -1497,7 +1557,7 @@ namespace NoOccupy
             }
             catch (Exception ex)
             {
-                ShowError("无法结束进程", ex.Message);
+                ShowError(L.T("无法结束进程"), ex.Message);
             }
         }
 
@@ -1509,7 +1569,7 @@ namespace NoOccupy
             }
             catch (Exception ex)
             {
-                ShowError("无法打开文件位置", ex.Message);
+                ShowError(L.T("无法打开文件位置"), ex.Message);
             }
         }
 
@@ -1525,7 +1585,7 @@ namespace NoOccupy
             }
             catch (Exception ex)
             {
-                ShowError("无法打开文件位置", ex.Message);
+                ShowError(L.T("无法打开文件位置"), ex.Message);
             }
         }
 
@@ -1619,6 +1679,106 @@ namespace NoOccupy
 
         #region 辅助
 
+        private void OnLanguageChanged(object sender, EventArgs e)
+        {
+            if (_suppressLanguageChange || _languageCombo == null)
+            {
+                return;
+            }
+
+            if (_isScanning || _isKilling)
+            {
+                SyncLanguageCombo();
+                return;
+            }
+
+            var selected = (UiLanguage)_languageCombo.SelectedIndex;
+            if (selected == L.Language)
+            {
+                return;
+            }
+
+            L.SetLanguage(selected);
+            ApplyLanguage();
+        }
+
+        private void SyncLanguageCombo()
+        {
+            if (_languageCombo == null)
+            {
+                return;
+            }
+
+            _suppressLanguageChange = true;
+            try
+            {
+                _languageCombo.SelectedIndex = (int)L.Language;
+            }
+            finally
+            {
+                _suppressLanguageChange = false;
+            }
+        }
+
+        private void ApplyLanguage()
+        {
+            Text = L.T("解除占用");
+            _titleLabel.Text = L.T("解除占用");
+            _subtitleLabel.Text = L.T("检测并结束正在占用此文件或文件夹的进程");
+            _languageLabel.Text = L.T("界面语言");
+            _toolTip.SetToolTip(_languageCombo, L.T("切换界面语言"));
+
+            _chooseFileButton.Text = L.T("选择文件…");
+            _chooseFolderButton.Text = L.T("选择文件夹…");
+            _emptyChooseFileButton.Text = L.T("选择文件…");
+            _emptyChooseFolderButton.Text = L.T("选择文件夹…");
+
+            _selectAllButton.Text = L.T("全选");
+            _selectNoneButton.Text = L.T("全不选");
+            _refreshButton.Text = L.T("刷新");
+            _killButton.Text = L.T("结束选中进程");
+
+            _killOneMenu.Text = L.T("结束该进程");
+            _locateMenu.Text = L.T("打开文件位置");
+
+            if (_listView.Columns.Count >= 5)
+            {
+                _listView.Columns[0].Text = L.T("进程名称");
+                _listView.Columns[2].Text = L.T("程序路径");
+                _listView.Columns[3].Text = L.T("来源");
+                _listView.Columns[4].Text = L.T("服务");
+            }
+
+            SyncLanguageCombo();
+
+            if (_isScanning || _isKilling)
+            {
+                return;
+            }
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(_currentPath))
+                {
+                    BeginScan(_currentPath);
+                }
+                else if (!string.IsNullOrWhiteSpace(_displayPath))
+                {
+                    ShowInvalidPath(_displayPath);
+                }
+                else
+                {
+                    ShowEmptyState();
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowScanFailure(ex);
+            }
+
+            UpdateUiState();
+        }
+
         private void UpdateUiState()
         {
             if (_closing || IsDisposed)
@@ -1651,6 +1811,7 @@ namespace NoOccupy
                 _chooseFolderButton.Enabled = !busy;
                 _emptyChooseFileButton.Enabled = !busy;
                 _emptyChooseFolderButton.Enabled = !busy;
+                _languageCombo.Enabled = !busy;
 
                 _selectAllButton.Enabled = !busy && selectableCount > 0 && checkedCount < selectableCount;
                 _selectNoneButton.Enabled = !busy && checkedCount > 0;
@@ -1738,7 +1899,7 @@ namespace NoOccupy
                 float scale = DeviceDpi / 96F;
                 int nameWidth = (int)Math.Round(200 * scale);
                 int pidWidth = (int)Math.Round(70 * scale);
-                int sourceWidth = (int)Math.Round(90 * scale);
+                int sourceWidth = (int)Math.Round(120 * scale);
                 int serviceWidth = (int)Math.Round(110 * scale);
                 int available = _listView.ClientSize.Width;
                 int pathWidth = Math.Max((int)Math.Round(180 * scale), available - (nameWidth + pidWidth + sourceWidth + serviceWidth) - 2);
@@ -1765,7 +1926,7 @@ namespace NoOccupy
             string path = process.ExecutablePath;
             if (string.IsNullOrWhiteSpace(path))
             {
-                ShowInformation("无法定位", "无法获取该进程的程序路径。");
+                ShowInformation(L.T("无法定位"), L.T("无法获取该进程的程序路径。"));
                 return;
             }
 
@@ -1803,11 +1964,11 @@ namespace NoOccupy
                     return;
                 }
 
-                ShowInformation("无法定位", "程序文件已不存在，无法打开所在位置。\r\n\r\n" + path);
+                ShowInformation(L.T("无法定位"), L.T("程序文件已不存在，无法打开所在位置。\r\n\r\n") + path);
             }
             catch (Exception ex)
             {
-                ShowError("无法打开文件位置", ex.Message);
+                ShowError(L.T("无法打开文件位置"), ex.Message);
             }
         }
 
@@ -1827,7 +1988,7 @@ namespace NoOccupy
                 return;
             }
 
-            MessageBox.Show(this, message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            UiDialog.Info(this, title, message, L.T("确定"));
         }
 
         private void ShowError(string title, string message)
@@ -1837,7 +1998,7 @@ namespace NoOccupy
                 return;
             }
 
-            MessageBox.Show(this, message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            UiDialog.Error(this, title, message, L.T("确定"));
         }
 
         private static string CleanPath(string path)

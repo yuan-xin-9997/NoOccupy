@@ -407,7 +407,7 @@ namespace NoOccupy.Core
 
             if (string.IsNullOrWhiteSpace(path))
             {
-                throw new ArgumentException("路径不能为空。", "path");
+                throw new ArgumentException(L.T("路径不能为空。"), "path");
             }
 
             string targetPath = ProcessUtil.NormalizePath(path);
@@ -449,13 +449,13 @@ namespace NoOccupy.Core
                 files = EnumerateFiles(targetPath, result, progress, ct);
                 result.ScannedFiles = files.Count;
                 Report(progress, string.Format(
-                    "已找到 {0} 个文件，开始检测占用...", files.Count));
+                    L.T("已找到 {0} 个文件，开始检测占用..."), files.Count));
             }
             else
             {
                 files = new List<string> { targetPath };
                 result.ScannedFiles = 1;
-                Report(progress, "正在检测文件占用...");
+                Report(progress, L.T("正在检测文件占用..."));
             }
 
             ct.ThrowIfCancellationRequested();
@@ -477,7 +477,7 @@ namespace NoOccupy.Core
                 }
                 catch (Exception ex)
                 {
-                    AddWarning(result, "重启管理器检测失败：" + ex.Message);
+                    AddWarning(result, L.T("重启管理器检测失败：") + ex.Message);
                 }
             }
 
@@ -486,8 +486,8 @@ namespace NoOccupy.Core
             {
                 ct.ThrowIfCancellationRequested();
                 Report(progress, isDirectory
-                    ? "正在深度扫描句柄（文件夹及子文件）..."
-                    : "正在深度扫描句柄...");
+                    ? L.T("正在深度扫描句柄（文件夹及子文件）...")
+                    : L.T("正在深度扫描句柄..."));
 
                 try
                 {
@@ -503,7 +503,7 @@ namespace NoOccupy.Core
                 }
                 catch (Exception ex)
                 {
-                    AddWarning(result, "句柄扫描失败：" + ex.Message);
+                    AddWarning(result, L.T("句柄扫描失败：") + ex.Message);
                 }
             }
 
@@ -511,7 +511,7 @@ namespace NoOccupy.Core
             if (isDirectory)
             {
                 ct.ThrowIfCancellationRequested();
-                Report(progress, "正在扫描进程模块路径...");
+                Report(progress, L.T("正在扫描进程模块路径..."));
 
                 try
                 {
@@ -527,7 +527,7 @@ namespace NoOccupy.Core
                 }
                 catch (Exception ex)
                 {
-                    AddWarning(result, "模块扫描失败：" + ex.Message);
+                    AddWarning(result, L.T("模块扫描失败：") + ex.Message);
                 }
             }
 
@@ -564,7 +564,7 @@ namespace NoOccupy.Core
             result.ElapsedMs = stopwatch.ElapsedMilliseconds;
 
             Report(progress, string.Format(
-                "扫描完成：{0} 个文件，{1} 个占用进程，用时 {2} 毫秒",
+                L.T("扫描完成：{0} 个文件，{1} 个占用进程，用时 {2} 毫秒"),
                 result.ScannedFiles,
                 result.Processes.Count,
                 result.ElapsedMs));
@@ -580,10 +580,10 @@ namespace NoOccupy.Core
 
             if (directoryLike)
             {
-                return new DirectoryNotFoundException("文件夹不存在：" + path);
+                return new DirectoryNotFoundException(L.T("文件夹不存在：") + path);
             }
 
-            return new FileNotFoundException("文件不存在：" + path, path);
+            return new FileNotFoundException(L.T("文件不存在：") + path, path);
         }
 
         /// <summary>用显式栈递归枚举文件，跳过符号链接/联接点，避免死循环。</summary>
@@ -610,7 +610,7 @@ namespace NoOccupy.Core
                 }
                 catch (Exception ex)
                 {
-                    AddWarning(result, "无法读取文件夹 " + directory + "：" + ex.Message);
+                    AddWarning(result, string.Format(L.T("无法读取文件夹 {0}：{1}"), directory, ex.Message));
                     continue;
                 }
 
@@ -628,11 +628,11 @@ namespace NoOccupy.Core
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    AddWarning(result, "无权限访问文件夹：" + directory);
+                    AddWarning(result, L.T("无权限访问文件夹：") + directory);
                 }
                 catch (DirectoryNotFoundException)
                 {
-                    AddWarning(result, "文件夹已不存在：" + directory);
+                    AddWarning(result, L.T("文件夹已不存在：") + directory);
                 }
                 catch (OperationCanceledException)
                 {
@@ -640,7 +640,7 @@ namespace NoOccupy.Core
                 }
                 catch (Exception ex)
                 {
-                    AddWarning(result, "枚举文件失败 " + directory + "：" + ex.Message);
+                    AddWarning(result, string.Format(L.T("枚举文件失败 {0}：{1}"), directory, ex.Message));
                 }
 
                 try
@@ -654,7 +654,7 @@ namespace NoOccupy.Core
                             if ((subDirectory.Attributes & FileAttributes.ReparsePoint) != 0)
                             {
                                 AddWarning(result,
-                                    "已跳过符号链接/联接点：" + subDirectory.FullName);
+                                    L.T("已跳过符号链接/联接点：") + subDirectory.FullName);
                                 continue;
                             }
                         }
@@ -669,11 +669,11 @@ namespace NoOccupy.Core
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    AddWarning(result, "无权限访问文件夹：" + directory);
+                    AddWarning(result, L.T("无权限访问文件夹：") + directory);
                 }
                 catch (DirectoryNotFoundException)
                 {
-                    AddWarning(result, "文件夹已不存在：" + directory);
+                    AddWarning(result, L.T("文件夹已不存在：") + directory);
                 }
                 catch (OperationCanceledException)
                 {
@@ -681,14 +681,14 @@ namespace NoOccupy.Core
                 }
                 catch (Exception ex)
                 {
-                    AddWarning(result, "枚举子文件夹失败 " + directory + "：" + ex.Message);
+                    AddWarning(result, string.Format(L.T("枚举子文件夹失败 {0}：{1}"), directory, ex.Message));
                 }
 
                 if (progress != null && files.Count - lastReportedCount >= 500)
                 {
                     lastReportedCount = files.Count;
                     Report(progress, string.Format(
-                        "正在枚举文件... 已找到 {0:N0} 个", files.Count));
+                        L.T("正在枚举文件... 已找到 {0:N0} 个"), files.Count));
                 }
             }
 
@@ -718,7 +718,7 @@ namespace NoOccupy.Core
             }
             catch (Exception ex)
             {
-                AddWarning(result, "无法枚举进程列表：" + ex.Message);
+                AddWarning(result, L.T("无法枚举进程列表：") + ex.Message);
                 return list;
             }
 
@@ -825,7 +825,7 @@ namespace NoOccupy.Core
                         (i % 20 == 19 || i == processes.Length - 1))
                     {
                         Report(progress, string.Format(
-                            "模块扫描 {0}/{1}...", i + 1, processes.Length));
+                            L.T("模块扫描 {0}/{1}..."), i + 1, processes.Length));
                     }
                 }
             }
@@ -920,7 +920,7 @@ namespace NoOccupy.Core
             }
             else if (result.Warnings.Count == maxWarnings)
             {
-                result.Warnings.Add("警告过多，后续警告已省略。");
+                result.Warnings.Add(L.T("警告过多，后续警告已省略。"));
             }
         }
 

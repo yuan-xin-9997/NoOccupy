@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NoOccupy.Localization;
 
 namespace NoOccupy.Setup
 {
@@ -16,8 +17,19 @@ namespace NoOccupy.Setup
         private Button _installButton;
         private Button _cancelButton;
         private Label _statusLabel;
+        private Label _titleLabel;
+        private Label _subtitleLabel;
+        private Label _versionLabel;
+        private Label _pathLabel;
+        private Label _noteLabel;
+        private Label _cardTitle;
+        private Label _cardBody;
+        private Label _languageLabel;
+        private ComboBox _languageCombo;
         private ProgressBar _progress;
         private bool _busy;
+        private bool _suppressLanguageChange;
+        private string _statusKey = "准备安装";
 
         public int ExitCode { get; private set; }
 
@@ -27,7 +39,7 @@ namespace NoOccupy.Setup
 
             Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
             AutoScaleMode = AutoScaleMode.None;
-            Text = "解除占用 安装程序";
+            Text = S.T("解除占用 安装程序");
             ClientSize = new Size(760, 520);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
@@ -148,9 +160,9 @@ namespace NoOccupy.Setup
             {
             }
 
-            Label title = new Label
+            _titleLabel = new Label
             {
-                Text = "解除占用",
+                Text = S.T("解除占用"),
                 Font = new Font("Segoe UI", 30F, FontStyle.Bold, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(17, 24, 39),
                 AutoSize = true,
@@ -158,9 +170,9 @@ namespace NoOccupy.Setup
                 BackColor = Color.Transparent
             };
 
-            Label subtitle = new Label
+            _subtitleLabel = new Label
             {
-                Text = "一键检测并结束正在占用文件或文件夹的进程",
+                Text = S.T("一键检测并结束正在占用文件或文件夹的进程"),
                 Font = new Font("Segoe UI", 14F, FontStyle.Regular, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(107, 114, 128),
                 AutoSize = true,
@@ -168,9 +180,9 @@ namespace NoOccupy.Setup
                 BackColor = Color.Transparent
             };
 
-            Label version = new Label
+            _versionLabel = new Label
             {
-                Text = "安装程序  v1.0.0",
+                Text = S.T("安装程序  v{0}", InstallerEngine.ProductVersion),
                 Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(156, 163, 175),
                 AutoSize = true,
@@ -178,10 +190,35 @@ namespace NoOccupy.Setup
                 BackColor = Color.Transparent
             };
 
+            _languageLabel = new Label
+            {
+                Text = S.T("界面语言"),
+                Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Pixel),
+                ForeColor = Color.FromArgb(107, 114, 128),
+                AutoSize = true,
+                Location = new Point(600, 14),
+                BackColor = Color.Transparent
+            };
+
+            _languageCombo = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Pixel),
+                Location = new Point(600, 36),
+                Size = new Size(130, 30),
+                TabStop = true
+            };
+            _languageCombo.Items.AddRange(S.NativeNames);
+            _languageCombo.SelectedIndex = (int)S.Language;
+            _languageCombo.SelectionChangeCommitted += OnLanguageChanged;
+
             header.Controls.Add(iconBox);
-            header.Controls.Add(title);
-            header.Controls.Add(subtitle);
-            header.Controls.Add(version);
+            header.Controls.Add(_titleLabel);
+            header.Controls.Add(_subtitleLabel);
+            header.Controls.Add(_versionLabel);
+            header.Controls.Add(_languageLabel);
+            header.Controls.Add(_languageCombo);
 
             Panel body = new Panel
             {
@@ -190,9 +227,9 @@ namespace NoOccupy.Setup
                 Padding = new Padding(28, 24, 28, 0)
             };
 
-            Label pathLabel = new Label
+            _pathLabel = new Label
             {
-                Text = "安装目录",
+                Text = S.T("安装目录"),
                 Font = new Font("Segoe UI", 13F, FontStyle.Bold, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(31, 41, 55),
                 AutoSize = true,
@@ -207,14 +244,14 @@ namespace NoOccupy.Setup
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            _browseButton = CreateSecondaryButton("浏览...");
+            _browseButton = CreateSecondaryButton(S.T("浏览..."));
             _browseButton.Location = new Point(666, 52);
             _browseButton.Size = new Size(96, 34);
             _browseButton.Click += OnBrowse;
 
             _desktopCheck = new CheckBox
             {
-                Text = "创建桌面快捷方式",
+                Text = S.T("创建桌面快捷方式"),
                 Font = new Font("Segoe UI", 13F, FontStyle.Regular, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(31, 41, 55),
                 AutoSize = true,
@@ -222,9 +259,9 @@ namespace NoOccupy.Setup
                 BackColor = Color.Transparent
             };
 
-            Label note = new Label
+            _noteLabel = new Label
             {
-                Text = "安装后将添加到文件、文件夹的右键菜单中。\r\nWindows 11 若未直接显示，请点击右键菜单底部的“显示更多选项”。",
+                Text = S.T("安装后将添加到文件、文件夹的右键菜单中。\r\nWindows 11 若未直接显示，请点击右键菜单底部的“显示更多选项”。"),
                 Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(107, 114, 128),
                 AutoSize = true,
@@ -246,18 +283,18 @@ namespace NoOccupy.Setup
                 }
             };
 
-            Label cardTitle = new Label
+            _cardTitle = new Label
             {
-                Text = "将安装以下内容",
+                Text = S.T("将安装以下内容"),
                 Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(31, 41, 55),
                 AutoSize = true,
                 Location = new Point(16, 8)
             };
 
-            Label cardBody = new Label
+            _cardBody = new Label
             {
-                Text = "•  主程序与卸载程序（约 0.3 MB）\r\n•  文件 / 文件夹右键菜单“解除占用”\r\n•  开始菜单快捷方式与系统卸载信息",
+                Text = S.T("•  主程序与卸载程序（约 0.3 MB）\r\n•  文件 / 文件夹右键菜单“{0}”\r\n•  开始菜单快捷方式与系统卸载信息", S.MenuLabel),
                 Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(75, 85, 99),
                 AutoSize = false,
@@ -265,14 +302,14 @@ namespace NoOccupy.Setup
                 Location = new Point(16, 30)
             };
 
-            card.Controls.Add(cardTitle);
-            card.Controls.Add(cardBody);
+            card.Controls.Add(_cardTitle);
+            card.Controls.Add(_cardBody);
 
-            body.Controls.Add(pathLabel);
+            body.Controls.Add(_pathLabel);
             body.Controls.Add(_pathBox);
             body.Controls.Add(_browseButton);
             body.Controls.Add(_desktopCheck);
-            body.Controls.Add(note);
+            body.Controls.Add(_noteLabel);
             body.Controls.Add(card);
 
             Panel footer = new Panel
@@ -300,7 +337,7 @@ namespace NoOccupy.Setup
 
             _statusLabel = new Label
             {
-                Text = "准备安装",
+                Text = S.T("准备安装"),
                 Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Pixel),
                 ForeColor = Color.FromArgb(107, 114, 128),
                 AutoSize = true,
@@ -308,7 +345,7 @@ namespace NoOccupy.Setup
                 BackColor = Color.Transparent
             };
 
-            _cancelButton = CreateSecondaryButton("取消");
+            _cancelButton = CreateSecondaryButton(S.T("取消"));
             _cancelButton.Size = new Size(88, 38);
             _cancelButton.Anchor = AnchorStyles.Right | AnchorStyles.Top;
             _cancelButton.Location = new Point(footer.Width - 30 - 88, 28);
@@ -316,7 +353,7 @@ namespace NoOccupy.Setup
 
             _installButton = new Button
             {
-                Text = "安装",
+                Text = S.T("安装"),
                 Font = new Font("Segoe UI", 14F, FontStyle.Bold, GraphicsUnit.Pixel),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(37, 99, 235),
@@ -362,6 +399,73 @@ namespace NoOccupy.Setup
             return button;
         }
 
+        private void OnLanguageChanged(object sender, EventArgs e)
+        {
+            if (_suppressLanguageChange || _languageCombo == null)
+            {
+                return;
+            }
+
+            if (_busy)
+            {
+                SyncLanguageCombo();
+                return;
+            }
+
+            var selected = (UiLanguage)_languageCombo.SelectedIndex;
+            if (selected == S.Language)
+            {
+                return;
+            }
+
+            S.SetLanguage(selected);
+            ApplyLanguage();
+        }
+
+        private void SyncLanguageCombo()
+        {
+            if (_languageCombo == null)
+            {
+                return;
+            }
+
+            _suppressLanguageChange = true;
+            try
+            {
+                _languageCombo.SelectedIndex = (int)S.Language;
+            }
+            finally
+            {
+                _suppressLanguageChange = false;
+            }
+        }
+
+        private void ApplyLanguage()
+        {
+            Text = S.T("解除占用 安装程序");
+            _titleLabel.Text = S.T("解除占用");
+            _subtitleLabel.Text = S.T("一键检测并结束正在占用文件或文件夹的进程");
+            _versionLabel.Text = S.T("安装程序  v{0}", InstallerEngine.ProductVersion);
+            _pathLabel.Text = S.T("安装目录");
+            _browseButton.Text = S.T("浏览...");
+            _desktopCheck.Text = S.T("创建桌面快捷方式");
+            _noteLabel.Text = S.T("安装后将添加到文件、文件夹的右键菜单中。\r\nWindows 11 若未直接显示，请点击右键菜单底部的“显示更多选项”。");
+            _cardTitle.Text = S.T("将安装以下内容");
+            _cardBody.Text = S.T("•  主程序与卸载程序（约 0.3 MB）\r\n•  文件 / 文件夹右键菜单“{0}”\r\n•  开始菜单快捷方式与系统卸载信息", S.MenuLabel);
+            _languageLabel.Text = S.T("界面语言");
+            _cancelButton.Text = S.T("取消");
+            _installButton.Text = S.T("安装");
+            _statusLabel.Text = S.T(_statusKey);
+            SyncLanguageCombo();
+        }
+
+        private void SetStatus(string key, Color color)
+        {
+            _statusKey = key;
+            _statusLabel.Text = S.T(key);
+            _statusLabel.ForeColor = color;
+        }
+
         private void OnBrowse(object sender, EventArgs e)
         {
             if (_busy)
@@ -373,7 +477,7 @@ namespace NoOccupy.Setup
             {
                 using (var dialog = new FolderBrowserDialog
                 {
-                    Description = "选择解除占用的安装目录",
+                    Description = S.T("选择解除占用的安装目录"),
                     ShowNewFolderButton = true,
                     SelectedPath = _pathBox.Text
                 })
@@ -386,7 +490,7 @@ namespace NoOccupy.Setup
             }
             catch (Exception ex)
             {
-                ShowError("无法选择目录", ex.Message);
+                ShowError(S.T("无法选择目录"), ex.Message);
             }
         }
 
@@ -404,14 +508,13 @@ namespace NoOccupy.Setup
             }
             catch (Exception ex)
             {
-                ShowError("安装目录无效", ex.Message);
+                ShowError(S.T("安装目录无效"), ex.Message);
                 return;
             }
 
             _busy = true;
             SetBusy(true);
-            _statusLabel.ForeColor = Color.FromArgb(37, 99, 235);
-            _statusLabel.Text = "正在安装，请稍候...";
+            SetStatus("正在安装，请稍候...", Color.FromArgb(37, 99, 235));
 
             try
             {
@@ -419,18 +522,16 @@ namespace NoOccupy.Setup
                 await Task.Run(() => InstallerEngine.Install(dir, desktop));
 
                 _progress.Visible = false;
-                _statusLabel.ForeColor = Color.FromArgb(22, 163, 74);
-                _statusLabel.Text = "安装完成";
+                SetStatus("安装完成", Color.FromArgb(22, 163, 74));
 
-                MessageBox.Show(
+                UiDialog.Info(
                     this,
-                    "“解除占用”已安装成功。\r\n\r\n" +
-                    "安装目录：" + dir + "\r\n\r\n" +
-                    "现在可以右键点击文件或文件夹，选择“解除占用”。\r\n" +
-                    "Windows 11 请在“显示更多选项”中查看。",
-                    "安装成功",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                    S.T("安装成功"),
+                    S.T(
+                        "“{0}”已安装成功。\r\n\r\n安装目录：{1}\r\n\r\n现在可以右键点击文件或文件夹，选择“{0}”。\r\nWindows 11 请在“显示更多选项”中查看。",
+                        S.MenuLabel,
+                        dir),
+                    S.T("确定"));
 
                 ExitCode = 0;
                 _busy = false;
@@ -440,10 +541,9 @@ namespace NoOccupy.Setup
             {
                 InstallerEngine.Log("界面安装失败：" + ex);
                 _progress.Visible = false;
-                _statusLabel.ForeColor = Color.FromArgb(185, 28, 28);
-                _statusLabel.Text = "安装失败";
+                SetStatus("安装失败", Color.FromArgb(185, 28, 28));
                 ExitCode = 1;
-                ShowError("安装失败", ex.Message + "\r\n\r\n日志：" + InstallerEngine.LogPath);
+                ShowError(S.T("安装失败"), ex.Message + "\r\n\r\n" + S.T("日志：") + InstallerEngine.LogPath);
             }
             finally
             {
@@ -472,6 +572,7 @@ namespace NoOccupy.Setup
             _desktopCheck.Enabled = !busy;
             _installButton.Enabled = !busy;
             _cancelButton.Enabled = !busy;
+            _languageCombo.Enabled = !busy;
             _progress.Visible = busy;
             _installButton.BackColor = busy
                 ? Color.FromArgb(191, 219, 254)
@@ -496,7 +597,7 @@ namespace NoOccupy.Setup
                 return;
             }
 
-            MessageBox.Show(this, message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            UiDialog.Error(this, title, message, S.T("确定"));
         }
 
         [DllImport("user32.dll")]

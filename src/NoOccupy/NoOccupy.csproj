@@ -11,13 +11,10 @@
     <AssemblyName>NoOccupy</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon Condition="Exists('app.ico')">app.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <Product>瑙ｉ櫎鍗犵敤</Product>
+    <Product>解除占用 (NoOccupy)</Product>
     <Company>NoOccupy</Company>
-    <Description>涓€閿В闄ゆ枃浠舵垨鏂囦欢澶硅绋嬪簭鍗犵敤</Description>
-    <Copyright>Copyright 漏 2026</Copyright>
+    <Description>一键解除文件或文件夹被程序占用</Description>
+    <Copyright>Copyright © 2026 NoOccupy</Copyright>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
@@ -27,6 +24,8 @@
 
   <ItemGroup>
     <Reference Include="System.Web.Extensions" />
+    <Compile Include="..\Shared\UiLanguage.cs" Link="Localization\UiLanguage.cs" />
+    <Compile Include="..\Shared\UiDialog.cs" Link="Localization\UiDialog.cs" />
   </ItemGroup>
 
 </Project>

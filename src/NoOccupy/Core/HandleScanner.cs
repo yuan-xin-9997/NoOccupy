@@ -108,13 +108,13 @@ namespace NoOccupy.Core
                 if (status != StatusInfoLengthMismatch || attempt >= 8)
                 {
                     throw new InvalidOperationException(
-                        "NtQuerySystemInformation 失败，状态码 0x" + status.ToString("X8"));
+                        L.T("NtQuerySystemInformation 失败，状态码 0x") + status.ToString("X8"));
                 }
 
                 long next = Math.Max((long)returnLength + 65536, (long)bufferSize * 2);
                 if (next <= bufferSize || next > MaxBufferSize)
                 {
-                    throw new InvalidOperationException("系统句柄表过大，无法枚举");
+                    throw new InvalidOperationException(L.T("系统句柄表过大，无法枚举"));
                 }
 
                 bufferSize = (uint)next;
@@ -160,7 +160,7 @@ namespace NoOccupy.Core
                 if (progress != null)
                 {
                     progress.Report(string.Format(
-                        "正在扫描系统句柄表（共 {0:N0} 个句柄）...", handleCount));
+                        L.T("正在扫描系统句柄表（共 {0:N0} 个句柄）..."), handleCount));
                 }
 
                 var matchedPids = new HashSet<int>();
@@ -261,7 +261,7 @@ namespace NoOccupy.Core
                             {
                                 skipPathQueries = true;
                                 AddWarning(warnings,
-                                    "多个文件句柄的路径查询超时，已跳过剩余句柄的深度扫描。");
+                                    L.T("多个文件句柄的路径查询超时，已跳过剩余句柄的深度扫描。"));
                             }
 
                             continue;
@@ -287,7 +287,7 @@ namespace NoOccupy.Core
                     if (progress != null && i > 0 && (i % 16384) == 0)
                     {
                         progress.Report(string.Format(
-                            "句柄扫描：已检查 {0:N0}/{1:N0} 个句柄，匹配 {2} 个进程...",
+                            L.T("句柄扫描：已检查 {0:N0}/{1:N0} 个句柄，匹配 {2} 个进程..."),
                             i,
                             handleCount,
                             matchedPids.Count));

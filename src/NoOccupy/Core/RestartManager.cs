@@ -104,7 +104,7 @@ namespace NoOccupy.Core
 
                 int count = Math.Min(BatchSize, files.Count - offset);
                 Report(progress, string.Format(
-                    "正在通过系统重启管理器检测第 {0}/{1} 批（本批 {2} 个文件）...",
+                    L.T("正在通过系统重启管理器检测第 {0}/{1} 批（本批 {2} 个文件）..."),
                     offset / BatchSize + 1,
                     totalBatches,
                     count));
@@ -128,8 +128,10 @@ namespace NoOccupy.Core
                 }
                 catch (Exception ex)
                 {
-                    AddWarning(warnings,
-                        "重启管理器检测第 " + (offset / BatchSize + 1) + " 批失败：" + ex.Message);
+                    AddWarning(warnings, string.Format(
+                        L.T("重启管理器检测第 {0} 批失败：{1}"),
+                        offset / BatchSize + 1,
+                        ex.Message));
                 }
             }
 
@@ -145,7 +147,7 @@ namespace NoOccupy.Core
             int rc = RmStartSession(out sessionHandle, 0, sessionKey);
             if (rc != ErrorSuccess)
             {
-                throw new InvalidOperationException("RmStartSession 失败，错误码 " + rc);
+                throw new InvalidOperationException(L.T("RmStartSession 失败，错误码 ") + rc);
             }
 
             try
@@ -153,7 +155,7 @@ namespace NoOccupy.Core
                 rc = RmRegisterResources(sessionHandle, (uint)files.Length, files, 0, null, 0, null);
                 if (rc != ErrorSuccess)
                 {
-                    throw new InvalidOperationException("RmRegisterResources 失败，错误码 " + rc);
+                    throw new InvalidOperationException(L.T("RmRegisterResources 失败，错误码 ") + rc);
                 }
 
                 uint needed = 0;
@@ -169,7 +171,7 @@ namespace NoOccupy.Core
 
                 if (rc != ErrorMoreData)
                 {
-                    throw new InvalidOperationException("RmGetList 失败，错误码 " + rc);
+                    throw new InvalidOperationException(L.T("RmGetList 失败，错误码 ") + rc);
                 }
 
                 for (int attempt = 0; attempt < MaxListAttempts; attempt++)
@@ -192,7 +194,7 @@ namespace NoOccupy.Core
 
                     if (rc != ErrorSuccess)
                     {
-                        throw new InvalidOperationException("RmGetList 失败，错误码 " + rc);
+                        throw new InvalidOperationException(L.T("RmGetList 失败，错误码 ") + rc);
                     }
 
                     int actual = (int)Math.Min(count, (uint)buffer.Length);
@@ -229,7 +231,7 @@ namespace NoOccupy.Core
                     return list;
                 }
 
-                throw new InvalidOperationException("RmGetList 多次重试后仍报告缓冲区不足");
+                throw new InvalidOperationException(L.T("RmGetList 多次重试后仍报告缓冲区不足"));
             }
             finally
             {

@@ -75,12 +75,14 @@ namespace NoOccupy.Setup
 
     internal static class InstallerEngine
     {
-        private const string ProductName = "解除占用";
-        private const string DisplayName = "解除占用 (NoOccupy)";
-        private const string ProductVersion = "1.0.0";
+        public static string ProductVersion
+        {
+            get { return typeof(InstallerEngine).Assembly.GetName().Version.ToString(3); }
+        }
         private const string AppExeName = "NoOccupy.exe";
         private const string UninstallerName = "NoOccupyUninstall.exe";
-        private const string ShortcutName = "解除占用.lnk";
+        private const string ShortcutName = "NoOccupy.lnk";
+        private const string LegacyShortcutName = "解除占用.lnk";
         private const string ArpKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\NoOccupy";
 
         private static readonly string[] MenuKeys =
@@ -139,7 +141,7 @@ namespace NoOccupy.Setup
             if (!string.IsNullOrEmpty(root) &&
                 string.Equals(dir.TrimEnd('\\'), root.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException("安装目录不能是磁盘根目录。");
+                throw new ArgumentException(S.T("安装目录不能是磁盘根目录。"));
             }
 
             return dir.TrimEnd('\\');
@@ -163,7 +165,7 @@ namespace NoOccupy.Setup
                 string exePath = Path.Combine(dir, AppExeName);
                 if (!File.Exists(exePath) || new FileInfo(exePath).Length < 20000)
                 {
-                    throw new InvalidOperationException("主程序释放失败，安装包可能不完整。");
+                    throw new InvalidOperationException(S.T("主程序释放失败，安装包可能不完整。"));
                 }
 
                 CopyUninstaller(dir);
@@ -178,7 +180,7 @@ namespace NoOccupy.Setup
             {
                 Log("安装失败：" + ex);
                 TryRollback(dir, dirExisted);
-                throw new InstallException("安装失败：" + ex.Message, ex);
+                throw new InstallException(S.T("安装失败：") + ex.Message, ex);
             }
         }
 
@@ -219,7 +221,7 @@ namespace NoOccupy.Setup
                 catch (Exception ex)
                 {
                     Log("启动临时卸载进程失败：" + ex);
-                    throw new InstallException("无法完成卸载：" + ex.Message, ex);
+                    throw new InstallException(S.T("无法完成卸载：") + ex.Message, ex);
                 }
 
                 return;
@@ -249,7 +251,7 @@ namespace NoOccupy.Setup
             catch (Exception ex)
             {
                 Log("计划删除失败：" + ex);
-                throw new InstallException("卸载信息已移除，但安装目录删除失败：" + ex.Message, ex);
+                throw new InstallException(S.T("卸载信息已移除，但安装目录删除失败：") + ex.Message, ex);
             }
         }
 
@@ -335,7 +337,7 @@ namespace NoOccupy.Setup
 
             if (stream == null)
             {
-                throw new InvalidOperationException("安装包内缺少资源：" + resourceName);
+                throw new InvalidOperationException(S.T("安装包内缺少资源：") + resourceName);
             }
 
             using (stream)
@@ -367,7 +369,7 @@ namespace NoOccupy.Setup
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(MenuKeys[0]))
             {
-                key.SetValue(null, ProductName);
+                key.SetValue(null, S.MenuLabel);
                 key.SetValue("Icon", icon);
                 key.SetValue("Position", "top");
                 key.SetValue("MultiSelectModel", "Single");
@@ -379,7 +381,7 @@ namespace NoOccupy.Setup
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(MenuKeys[1]))
             {
-                key.SetValue(null, ProductName);
+                key.SetValue(null, S.MenuLabel);
                 key.SetValue("Icon", icon);
                 key.SetValue("Position", "top");
                 key.SetValue("MultiSelectModel", "Single");
@@ -391,7 +393,7 @@ namespace NoOccupy.Setup
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(MenuKeys[2]))
             {
-                key.SetValue(null, ProductName);
+                key.SetValue(null, S.MenuLabel);
                 key.SetValue("Icon", icon);
                 key.SetValue("Position", "top");
                 key.SetValue("MultiSelectModel", "Single");
@@ -426,13 +428,15 @@ namespace NoOccupy.Setup
             string programs = Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms);
             if (!string.IsNullOrWhiteSpace(programs))
             {
-                CreateShortcut(Path.Combine(programs, ShortcutName), exe, "检测并结束占用文件的进程");
+                DeleteShortcut(programs);
+                CreateShortcut(Path.Combine(programs, ShortcutName), exe, S.T("检测并结束占用文件的进程"));
             }
 
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
             if (createDesktop && !string.IsNullOrWhiteSpace(desktop))
             {
-                CreateShortcut(Path.Combine(desktop, ShortcutName), exe, "检测并结束占用文件的进程");
+                DeleteShortcut(desktop);
+                CreateShortcut(Path.Combine(desktop, ShortcutName), exe, S.T("检测并结束占用文件的进程"));
             }
             else
             {
@@ -455,18 +459,21 @@ namespace NoOccupy.Setup
                 return;
             }
 
-            try
+            foreach (string name in new[] { ShortcutName, LegacyShortcutName })
             {
-                string path = Path.Combine(directory, ShortcutName);
-                if (File.Exists(path))
+                try
                 {
-                    File.Delete(path);
-                    Log("删除快捷方式：" + path);
+                    string path = Path.Combine(directory, name);
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                        Log("删除快捷方式：" + path);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log("删除快捷方式失败：" + ex.Message);
+                catch (Exception ex)
+                {
+                    Log("删除快捷方式失败：" + ex.Message);
+                }
             }
         }
 
@@ -477,7 +484,7 @@ namespace NoOccupy.Setup
                 Type shellType = Type.GetTypeFromProgID("WScript.Shell");
                 if (shellType == null)
                 {
-                    throw new InvalidOperationException("系统未提供 WScript.Shell。");
+                    throw new InvalidOperationException(S.T("系统未提供 WScript.Shell。"));
                 }
 
                 object shell = Activator.CreateInstance(shellType);
@@ -522,7 +529,7 @@ namespace NoOccupy.Setup
 
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(ArpKeyPath))
             {
-                key.SetValue("DisplayName", DisplayName);
+                key.SetValue("DisplayName", S.MenuLabel + " (NoOccupy)");
                 key.SetValue("DisplayVersion", ProductVersion);
                 key.SetValue("Publisher", "NoOccupy");
                 key.SetValue("DisplayIcon", exe + ",0");

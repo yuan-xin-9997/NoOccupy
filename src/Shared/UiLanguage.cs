@@ -38,6 +38,9 @@ namespace NoOccupy.Localization
             @"Software\Classes\Directory\Background\shell\NoOccupy"
         };
 
+        internal const string UninstallKeyPath =
+            @"Software\Microsoft\Windows\CurrentVersion\Uninstall\NoOccupy";
+
         private static readonly object Sync = new object();
         private static bool _loaded;
         private static UiLanguage _current;
@@ -165,7 +168,9 @@ namespace NoOccupy.Localization
             return GetCode(language);
         }
 
-        /// <summary>把右键菜单显示名更新为当前语言；未安装时自动跳过。</summary>
+        /// <summary>
+        /// 把右键菜单和卸载列表显示名更新为当前语言；未安装时自动跳过。
+        /// </summary>
         internal static void UpdateContextMenuLabel(string label)
         {
             if (string.IsNullOrWhiteSpace(label))
@@ -189,6 +194,33 @@ namespace NoOccupy.Localization
                 {
                     // 没有管理员权限或菜单项不存在时忽略。
                 }
+            }
+
+            UpdateUninstallDisplayName(label);
+        }
+
+        private static void UpdateUninstallDisplayName(string label)
+        {
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(UninstallKeyPath, true))
+                {
+                    if (key == null)
+                    {
+                        return;
+                    }
+
+                    string displayName = label + " (NoOccupy)";
+                    string current = key.GetValue("DisplayName") as string;
+                    if (!string.Equals(current, displayName, StringComparison.Ordinal))
+                    {
+                        key.SetValue("DisplayName", displayName, RegistryValueKind.String);
+                    }
+                }
+            }
+            catch
+            {
+                // 没有管理员权限或卸载项不存在时忽略。
             }
         }
 

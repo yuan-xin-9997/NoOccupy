@@ -11,10 +11,10 @@
 | 项目 | 值 |
 | --- | --- |
 | 安装包 | `E:\dev\NoOccupy\NoOccupy-Setup.exe` |
-| 大小 | 239,616 字节（234.0 KB） |
-| SHA256 | `B3B927762440D1C13E310FC90B6BD68AF9679190BE98C77A4A067B0DFF9EC78B` |
-| 主程序 | 146,432 字节 |
-| 主程序 SHA256 | `7F9C6961C2F199E8393BF3546E2E52056CB611E669F3F4732A3EEF9CD1A3E6DD` |
+| 大小 | 240,128 字节（234.5 KB） |
+| SHA256 | `A954CD0E39E74D0E47BF357F55CE67D2211E4FA9BC50D294C6A6E8FF77034FA3` |
+| 主程序 | 146,944 字节 |
+| 主程序 SHA256 | `ED02388C39F95D165E6B4A2E44830D7554DA4D81A16CD5D74D35C788942DF7A4` |
 | 安装包内卸载器 | 与安装包同一文件，复制为 `NoOccupyUninstall.exe` |
 
 最终安装目录中的 `NoOccupyUninstall.exe` 与根目录安装包 SHA256 一致，说明已安装的是当前构建产物。
@@ -38,6 +38,8 @@
 启动时焦点移到“选择文件”按钮，避免语言下拉框获得焦点后把当前语言显示成蓝色选中状态。
 
 空状态和无效路径状态也按语言刷新；例如韩文空状态、日文无效路径均通过截图确认。
+
+切换语言时，三处右键菜单和“设置 → 应用”中的 ARP 显示名也会同步更新。实测中文 → English → 中文，菜单与 ARP 名称分别变为 `Release Lock / Release Lock (NoOccupy)`，再恢复为 `解除占用 / 解除占用 (NoOccupy)`。
 
 ## 3. 安装器四语言
 
@@ -101,8 +103,8 @@ Windows 11 では「その他のオプションを表示」から開けます。
 
 | 检查项 | 结果 |
 | --- | --- |
-| `C:\Program Files\NoOccupy\NoOccupy.exe` | 146,432 字节，哈希匹配当前构建 |
-| `NoOccupyUninstall.exe` | 239,616 字节，哈希匹配根目录安装包 |
+| `C:\Program Files\NoOccupy\NoOccupy.exe` | 146,944 字节，哈希匹配当前构建 |
+| `NoOccupyUninstall.exe` | 240,128 字节，哈希匹配根目录安装包 |
 | `HKLM\...\*\shell\NoOccupy` | `解除占用` |
 | `HKLM\...\Directory\shell\NoOccupy` | `解除占用` |
 | `HKLM\...\Directory\Background\shell\NoOccupy` | `解除占用` |

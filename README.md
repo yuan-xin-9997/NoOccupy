@@ -110,14 +110,14 @@ You can also open NoOccupy from the Start menu and use **Choose file…** or **C
 
 ## Languages
 
-| Language | Explorer / Start menu name | Windows uninstall entry |
+| Language | Explorer menu name | Windows uninstall entry |
 | --- | --- | --- |
 | English | Release Lock | Release Lock (NoOccupy) |
 | 简体中文 | 解除占用 | 解除占用 (NoOccupy) |
 | 日本語 | 占有を解除 | 占有を解除 (NoOccupy) |
 | 한국어 | 점유 해제 | 점유 해제 (NoOccupy) |
 
-Choose a language at the top of the installer or in the app's upper-right **Language** menu. The interface, dialogs, and installed Explorer entries update immediately.
+Choose a language at the top of the installer or in the app's upper-right **Language** menu. The interface, dialogs, Explorer menu names, and Windows uninstall entry update immediately. The Start menu shortcut filename stays `NoOccupy.lnk`; its description is written in the selected language during installation.
 
 Your selection is saved in `HKCU\Software\NoOccupy\Language` and shared by the app and installer. On first launch, Chinese, Japanese, and Korean system languages are detected automatically; other system languages use English. CLI output remains Chinese for script compatibility.
 

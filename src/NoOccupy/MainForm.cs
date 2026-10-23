@@ -1240,6 +1240,11 @@ namespace NoOccupy
             }
 
             string message;
+            // Preview the same application parents that the core will stop.
+            processes = ApplicationProcesses.Expand(processes.Select(p => p.Pid))
+                .Select(pid => processes.FirstOrDefault(p => p.Pid == pid)
+                    ?? ProcessUtil.CreateLockingProcess(pid, LockSource.HandleScan))
+                .ToList();
             if (processes.Count == 1)
             {
                 LockingProcess process = processes[0];
@@ -1256,6 +1261,8 @@ namespace NoOccupy
                     processes.Count);
             }
 
+            message += Environment.NewLine + Environment.NewLine + string.Join(Environment.NewLine,
+                processes.Select(p => p.Name + " (PID " + p.Pid + ")"));
             if (UiDialog.Confirm(
                 this,
                 L.T("结束进程"),
@@ -1294,24 +1301,21 @@ namespace NoOccupy
                     return;
                 }
 
+                SetStatus(L.T("正在复查占用…"), UiTheme.Primary, string.Empty);
+                ScanResult verification = await Task.Run(() =>
+                    LockFinder.Scan(_currentPath, true, progress, CancellationToken.None));
+                if (_closing || IsDisposed)
+                {
+                    return;
+                }
+                ApplyScanResult(verification);
                 _isKilling = false;
                 _marquee.StopAnimation();
                 _marquee.Visible = false;
                 UpdateUiState();
 
-                ShowKillResult(result);
+                ShowKillResult(result, verification);
 
-                if (!_closing && !IsDisposed)
-                {
-                    if (!string.IsNullOrWhiteSpace(_currentPath))
-                    {
-                        BeginScan(_currentPath);
-                    }
-                    else
-                    {
-                        SetStatus(L.T("操作完成"), UiTheme.Muted, string.Empty);
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -1340,13 +1344,22 @@ namespace NoOccupy
             }
         }
 
-        private void ShowKillResult(KillResult result)
+        private void ShowKillResult(KillResult result, ScanResult verification)
         {
             int succeeded = result == null ? 0 : result.Succeeded;
             int failed = result == null ? 0 : result.Failed;
 
             var message = new StringBuilder();
             message.AppendFormat(L.T("成功 {0} 个 / 失败 {1} 个。"), succeeded, failed);
+            bool remaining = verification.Processes.Count > 0;
+            message.AppendLine();
+            message.AppendLine(L.T(remaining
+                ? "复查仍发现占用进程，可能已被其他程序重新启动。请查看列表并退出对应软件后重试。"
+                : "复查未发现占用进程，请重试文件操作。"));
+            if (verification.Warnings.Count > 0)
+            {
+                message.AppendLine(L.T("复查存在警告，无法保证所有占用均已检出。"));
+            }
 
             if (failed > 0 && result != null && result.Outcomes != null)
             {
@@ -1380,7 +1393,7 @@ namespace NoOccupy
                 }
             }
 
-            if (failed == 0)
+            if (failed == 0 && !remaining && verification.Warnings.Count == 0)
             {
                 UiDialog.Info(this, L.T("操作完成"), message.ToString(), L.T("确定"));
             }

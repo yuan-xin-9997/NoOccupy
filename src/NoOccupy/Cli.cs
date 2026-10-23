@@ -193,13 +193,15 @@ namespace NoOccupy
                 }
 
                 KillResult killResult = ProcessKiller.Kill(pids, null);
+                ScanResult verification = LockFinder.Scan(
+                    options.Path, true, null, CancellationToken.None);
 
                 string output = options.Json
-                    ? ToJson(BuildKillPayload(result, killResult))
-                    : FormatKillText(result, killResult);
+                    ? ToJson(BuildKillPayload(verification, killResult))
+                    : FormatKillText(verification, killResult);
 
                 bool emitted = Emit(output, options.OutFile);
-                if (!emitted || killResult.Failed > 0)
+                if (!emitted || killResult.Failed > 0 || verification.Processes.Count > 0 || verification.Warnings.Count > 0)
                 {
                     return emitted ? 2 : 1;
                 }

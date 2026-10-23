@@ -26,6 +26,8 @@ English | [简体中文](README.cn.md) | [Changelog](CHANGELOG.md)
 
 Right-click a file or folder, choose **Release Lock**, review the processes, and end the ones you select. Then retry your delete, move, or rename operation.
 
+For helpers that are automatically restarted, NoOccupy also ends parent processes in the same application directory and lists them in the confirmation dialog. It rechecks locks before reporting the result. This can interrupt downloads and unsaved work in that application.
+
 ## Screenshots
 
 <div align="center">

@@ -35,7 +35,7 @@ namespace NoOccupy.Core
             // 去重，保持调用方传入的顺序。
             var seen = new HashSet<int>();
 
-            foreach (int pid in pids)
+            foreach (int pid in ApplicationProcesses.Expand(pids))
             {
                 if (!seen.Add(pid))
                 {

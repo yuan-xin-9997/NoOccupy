@@ -13,6 +13,10 @@ namespace NoOccupy
         private static readonly Dictionary<string, string> English =
             new Dictionary<string, string>(StringComparer.Ordinal)
             {
+                { "正在复查占用…", "Checking locks again…" },
+                { "复查仍发现占用进程，可能已被其他程序重新启动。请查看列表并退出对应软件后重试。", "Locks remain; another application may have restarted a process. Check the list, exit that application, and retry." },
+                { "复查未发现占用进程，请重试文件操作。", "No locking processes found on recheck. Retry the file operation." },
+                { "复查存在警告，无法保证所有占用均已检出。", "The recheck has warnings; some locks may not have been detected." },
                 { "解除占用", "Release Lock" },
                 { "检测并结束正在占用此文件或文件夹的进程", "Find and end processes that are using this file or folder" },
                 { "尚未选择文件或文件夹", "No file or folder selected" },
@@ -137,6 +141,10 @@ namespace NoOccupy
         private static readonly Dictionary<string, string> Japanese =
             new Dictionary<string, string>(StringComparer.Ordinal)
             {
+                { "正在复查占用…", "占有を再確認中…" },
+                { "复查仍发现占用进程，可能已被其他程序重新启动。请查看列表并退出对应软件后重试。", "占有が残っています。他のアプリがプロセスを再起動した可能性があります。一覧を確認し、該当アプリを終了して再試行してください。" },
+                { "复查未发现占用进程，请重试文件操作。", "再確認では占有プロセスは見つかりませんでした。ファイル操作を再試行してください。" },
+                { "复查存在警告，无法保证所有占用均已检出。", "再確認に警告があります。すべての占有を検出できたとは限りません。" },
                 { "解除占用", "占有を解除" },
                 { "检测并结束正在占用此文件或文件夹的进程", "このファイルまたはフォルダーを使用しているプロセスを検出して終了します" },
                 { "尚未选择文件或文件夹", "ファイルまたはフォルダーが選択されていません" },
@@ -259,6 +267,10 @@ namespace NoOccupy
         private static readonly Dictionary<string, string> Korean =
             new Dictionary<string, string>(StringComparer.Ordinal)
             {
+                { "正在复查占用…", "점유 재확인 중…" },
+                { "复查仍发现占用进程，可能已被其他程序重新启动。请查看列表并退出对应软件后重试。", "점유가 남아 있습니다. 다른 앱이 프로세스를 다시 시작했을 수 있습니다. 목록을 확인하고 해당 앱을 종료한 후 다시 시도하세요." },
+                { "复查未发现占用进程，请重试文件操作。", "재확인에서 점유 프로세스를 찾지 못했습니다. 파일 작업을 다시 시도하세요." },
+                { "复查存在警告，无法保证所有占用均已检出。", "재확인 경고가 있습니다. 일부 점유를 찾지 못했을 수 있습니다." },
                 { "解除占用", "점유 해제" },
                 { "检测并结束正在占用此文件或文件夹的进程", "이 파일이나 폴더를 사용 중인 프로세스를 찾아 종료합니다" },
                 { "尚未选择文件或文件夹", "파일이나 폴더를 선택하지 않았습니다" },

@@ -1,6 +1,7 @@
 # 安装 / 卸载与四语言验收报告
 
-- 日期：2026-10-22
+- 日期：2026-10-23
+- 版本：1.0.1
 - 系统：Windows 11 家庭中文版，Build 26300
 - 运行时：.NET Framework 4.8.1（4.8.10008）
 - 显示：3840 × 2160，150% 缩放（DPI 144）
@@ -12,9 +13,9 @@
 | --- | --- |
 | 安装包 | `E:\dev\NoOccupy\NoOccupy-Setup.exe` |
 | 大小 | 240,128 字节（234.5 KB） |
-| SHA256 | `A954CD0E39E74D0E47BF357F55CE67D2211E4FA9BC50D294C6A6E8FF77034FA3` |
+| SHA256 | `2C93155952FE7A187196E960450937A6C2820A7CE245AC07008489E3661C5255` |
 | 主程序 | 146,944 字节 |
-| 主程序 SHA256 | `ED02388C39F95D165E6B4A2E44830D7554DA4D81A16CD5D74D35C788942DF7A4` |
+| 主程序 SHA256 | `B32B841B428C2A8960B3DBF8EB611DEA12EDAA374C2DA3FB36164BB033BBE9BA` |
 | 安装包内卸载器 | 与安装包同一文件，复制为 `NoOccupyUninstall.exe` |
 
 最终安装目录中的 `NoOccupyUninstall.exe` 与根目录安装包 SHA256 一致，说明已安装的是当前构建产物。

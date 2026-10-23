@@ -141,7 +141,7 @@ dotnet build E:\dev\NoOccupy\src\NoOccupy\NoOccupy.csproj -c Release `
 ### 12. 版本与帮助
 
 ```
-NoOccupy 1.0.0.0
+NoOccupy 1.0.1.0
 ```
 
 `--help` 返回完整用法、选项和退出码说明，退出码 0。

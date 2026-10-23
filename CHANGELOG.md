@@ -1,5 +1,14 @@
 # Changelog / 更新日志
 
+## v1.0.1 — 2026-10-23
+
+Maintenance release.
+
+- Keep the Windows uninstall entry name in sync when you switch the interface language.
+- Rebuild the installer so its file version matches the application (`1.0.1`).
+
+维护版本。切换界面语言时，同步更新“设置 → 应用”中的卸载项名称；同时重新构建安装包，使安装器版本与主程序一致（`1.0.1`）。
+
 ## v1.0.0 — 2026-10-22
 
 First tagged release of NoOccupy for Windows 10/11 (64-bit).

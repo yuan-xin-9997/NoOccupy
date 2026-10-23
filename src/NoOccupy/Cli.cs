@@ -626,11 +626,11 @@ namespace NoOccupy
             try
             {
                 Version version = typeof(Cli).Assembly.GetName().Version;
-                return version == null ? "1.0.0" : version.ToString();
+                return version == null ? "1.0.1" : version.ToString();
             }
             catch
             {
-                return "1.0.0";
+                return "1.0.1";
             }
         }
 

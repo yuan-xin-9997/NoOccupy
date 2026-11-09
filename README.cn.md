@@ -174,7 +174,7 @@ NoOccupy 注册的是资源管理器传统右键菜单。Windows 11 将此类入
 ## 支持
 
 - 销售网站与激活码：<https://nooccupy.yuan-xin.top/>
-- 支持邮箱：<yuanxin9997@163.com>
+- 支持邮箱：<support@yuan-xin.top>
 - 问题反馈：在本仓库提交 Issue。
 
 ## 更新日志

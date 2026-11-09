@@ -170,7 +170,7 @@ Uninstall removes the program folder, Explorer menus, Start menu shortcut, and u
 ## Support
 
 - Store and activation codes: <https://nooccupy.yuan-xin.top/>
-- Support email: <yuanxin9997@163.com>
+- Support email: <support@yuan-xin.top>
 - Report a problem: open an issue in this repository.
 
 ## Changelog

@@ -80,7 +80,7 @@ For helpers that are automatically restarted, NoOccupy also ends parent processe
 2. Allow the Windows administrator prompt.
 3. Select your language and install folder. The default is `C:\Program Files\NoOccupy`.
 4. Click **Install**. The installer adds Explorer menus, a Start menu shortcut, and a Windows uninstall entry.
-5. Start NoOccupy. If your version requires activation, enter the code you received.
+5. Start NoOccupy. v1.1.0 requires activation: enter the code you received.
 
 A desktop shortcut is optional and disabled by default.
 
@@ -113,7 +113,7 @@ NoOccupy v1.1.0 introduces **offline activation**:
 
 The activation window and the main window both include a purchase entry. If you do not have a code, click **Buy activation code** in the activation window or visit the [store](https://nooccupy.yuan-xin.top/).
 
-> v1.0.2 remains the latest stable release. The v1.1.0 activation build will be published as a pre-release after validation. Check the [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases) page for the current build.
+> v1.1.0 is the current release and requires activation. Download it from [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases/latest), buy a code from the [store](https://nooccupy.yuan-xin.top/), and activate with the machine code shown in the app.
 
 ## Quick Start
 

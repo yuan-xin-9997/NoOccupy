@@ -80,7 +80,7 @@
 2. 在 Windows 管理员权限提示中选择允许。
 3. 选择界面语言和安装目录，默认目录为 `C:\Program Files\NoOccupy`。
 4. 点击 **安装**。安装器会添加资源管理器右键菜单、开始菜单快捷方式和系统卸载项。
-5. 启动 NoOccupy。如果当前版本需要激活，输入收到的激活码。
+5. 启动 NoOccupy。v1.1.0 需要激活，输入收到的激活码。
 
 桌面快捷方式默认不创建，可以在安装界面中勾选。
 
@@ -113,7 +113,7 @@ NoOccupy v1.1.0 开始支持 **离线激活**：
 
 激活窗口和主界面都提供购买入口。没有激活码时，点击激活窗口中的 **购买激活码**，或访问 [销售网站](https://nooccupy.yuan-xin.top/)。
 
-> v1.0.2 仍是当前最新稳定版；v1.1.0 激活版会在验证完成后以预发布形式发布。请以 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases) 页面为准。
+> v1.1.0 是当前版本，安装后必须激活。请从 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases/latest) 下载，在 [销售网站](https://nooccupy.yuan-xin.top/) 购买激活码，然后用软件显示的机器码完成激活。
 
 ## 快速上手
 

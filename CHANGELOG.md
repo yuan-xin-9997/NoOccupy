@@ -1,6 +1,6 @@
 # Changelog / 更新日志
 
-## v1.1.0 (preview) — 2026-11-08
+## v1.1.0 — 2026-11-08
 
 Activation release.
 

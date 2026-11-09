@@ -113,7 +113,7 @@ NoOccupy v1.1.0 introduces **offline activation**:
 
 The activation window and the main window both include a purchase entry. If you do not have a code, click **Buy activation code** in the activation window or visit the [store](https://nooccupy.yuan-xin.top/).
 
-> v1.0.2 remains the latest stable release. The v1.1.0 activation build is published as a pre-release while it is being validated. Check the [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases) page for the current build.
+> v1.0.2 remains the latest stable release. The v1.1.0 activation build will be published as a pre-release after validation. Check the [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases) page for the current build.
 
 ## Quick Start
 

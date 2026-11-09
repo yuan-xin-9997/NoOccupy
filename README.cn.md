@@ -113,7 +113,7 @@ NoOccupy v1.1.0 开始支持 **离线激活**：
 
 激活窗口和主界面都提供购买入口。没有激活码时，点击激活窗口中的 **购买激活码**，或访问 [销售网站](https://nooccupy.yuan-xin.top/)。
 
-> v1.0.2 仍是当前最新稳定版；v1.1.0 激活版会在验证完成后发布。请以 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases) 页面为准。
+> v1.0.2 仍是当前最新稳定版；v1.1.0 激活版会在验证完成后以预发布形式发布。请以 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases) 页面为准。
 
 ## 快速上手
 

@@ -113,6 +113,8 @@ NoOccupy v1.1.0 开始支持 **离线激活**：
 
 激活窗口和主界面都提供购买入口。没有激活码时，点击激活窗口中的 **购买激活码**，或访问 [销售网站](https://nooccupy.yuan-xin.top/)。
 
+授权价格为 **4.99 美元**，一次买断，最多可在 **2 台电脑** 上激活，包含 **1 年授权更新**。
+
 > v1.1.0 是当前版本，安装后必须激活。请从 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases/latest) 下载，在 [销售网站](https://nooccupy.yuan-xin.top/) 购买激活码，然后用软件显示的机器码完成激活。
 
 ## 快速上手

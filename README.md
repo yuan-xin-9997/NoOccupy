@@ -113,6 +113,8 @@ NoOccupy v1.1.0 introduces **offline activation**:
 
 The activation window and the main window both include a purchase entry. If you do not have a code, click **Buy activation code** in the activation window or visit the [store](https://nooccupy.yuan-xin.top/).
 
+A license costs **US$4.99** as a one-time purchase, covers up to **2 computers**, and includes **1 year of license updates**.
+
 > v1.1.0 is the current release and requires activation. Download it from [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases/latest), buy a code from the [store](https://nooccupy.yuan-xin.top/), and activate with the machine code shown in the app.
 
 ## Quick Start

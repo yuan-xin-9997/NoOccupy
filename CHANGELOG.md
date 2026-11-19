@@ -1,5 +1,23 @@
 # Changelog / 更新日志
 
+## v1.2.0 — 2026-11-19
+
+Free trial release.
+
+- Add a **30-day free trial** that only counts calendar days on which the app is actually opened; days without launching do not consume the trial.
+- Trial progress is kept across uninstall/reinstall — reinstalling does not reset the trial.
+- Unlicensed use (during the trial) is fully functional: GUI, scanning, termination, and CLI all work; `--license --json` reports a `trial` object.
+- Add an **optional, skippable uninstall survey** in the interactive uninstaller; submissions are anonymous. Silent uninstall never shows it, and submit failures never block uninstallation.
+- Trial-expired use returns exit code `3` and asks for an activation code.
+
+免费试用版本。
+
+- 新增 **30 天免费试用**：只有当天打开过软件才计为一天；没有打开软件的日子不消耗试用。
+- 卸载重装不会刷新试用（试用进度保留在本机）。
+- 试用期内未激活也可完整使用：图形界面、扫描、结束进程和命令行均可用；`--license --json` 新增 `trial` 字段。
+- 图形卸载器新增**可跳过的匿名卸载调研**；静默卸载不显示，提交失败不影响卸载。
+- 试用结束后返回退出码 `3`，提示输入激活码。
+
 ## v1.1.0 — 2026-11-08
 
 Activation release.

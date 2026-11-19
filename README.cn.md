@@ -12,17 +12,17 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-lightgrey)](#下载安装)
 [![Languages](https://img.shields.io/badge/languages-4-green)](#界面语言)
 [![Download EXE](https://img.shields.io/badge/download-.exe-0078D4)](https://github.com/yuan-xin-9997/NoOccupy/releases/latest/download/NoOccupy-Setup.exe)
-[![Buy](https://img.shields.io/badge/buy-%E8%B4%AD%E4%B9%B0%E6%BF%80%E6%B4%BB%E7%A0%81-16a34a)](https://nooccupy.yuan-xin.top/)
+[![免费试用](https://img.shields.io/badge/%E5%85%8D%E8%B4%B9%E8%AF%95%E7%94%A8-30%20%E5%A4%A9-16a34a)](https://nooccupy.yuan-xin.top/)
 
 [English](README.md) | 简体中文 | [更新日志](CHANGELOG.md)
 
-**[下载](#下载安装) · [功能特性](#功能特性) · [激活与购买](#激活与购买) · [常见问题](#常见问题) · [支持](#支持)**
+**[下载](#下载安装) · [功能特性](#功能特性) · [免费试用与激活](#免费试用与激活) · [常见问题](#常见问题) · [支持](#支持)**
 
 </div>
 
 > **关于本仓库**
 >
-> 本仓库用于发布 NoOccupy 官方安装包和用户文档；源代码维护在私有仓库中。请从 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases/latest) 下载安装包，或在 [销售网站](https://nooccupy.yuan-xin.top/) 购买激活码。
+> 本仓库用于发布 NoOccupy 官方安装包和用户文档；源代码维护在私有仓库中。请从 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases/latest) 下载安装包，安装后自动开始 **30 天免费试用**；激活码可在 [销售网站](https://nooccupy.yuan-xin.top/) 获取。
 
 ## 项目介绍
 
@@ -61,18 +61,19 @@
 | 清晰的进程信息 | 展示进程名称、PID、程序路径、检测来源和服务。 |
 | 按需结束进程 | 支持单选、多选和全选，结束前确认；标记并跳过已知关键进程。 |
 | 四语言支持 | 主程序、安装器、激活窗口和确认对话框均支持中文、英文、日文、韩文。 |
+| 30 天免费试用 | 安装后免费使用全部功能 30 天；只有当天打开过软件才计为一天，不打开不消耗，卸载重装也不会刷新试用。 |
 | 轻量运行 | 单文件安装包约 0.3 MB，无后台服务。 |
-| 离线激活 | 从 v1.1.0 开始支持与本机绑定的离线激活码；激活和日常使用均不访问授权服务器。 |
+| 离线激活 | 试用结束后输入与本机绑定的离线激活码；激活和日常使用均不访问授权服务器。 |
 | 自动化接口 | 提供命令行扫描与结束进程功能，支持 JSON 输出和退出码。 |
 
 ## 下载安装
 
 | 下载内容 | 说明 |
 | --- | --- |
-| **[NoOccupy-Setup.exe](https://github.com/yuan-xin-9997/NoOccupy/releases/latest/download/NoOccupy-Setup.exe)** | 推荐：Windows 单文件安装包。 |
+| **[NoOccupy-Setup.exe](https://github.com/yuan-xin-9997/NoOccupy/releases/latest/download/NoOccupy-Setup.exe)** | 推荐：Windows 单文件安装包。安装后自动开始 30 天免费试用。 |
 | [全部版本](https://github.com/yuan-xin-9997/NoOccupy/releases) | 查看版本历史、发布说明及旧版安装包。 |
 | [SHA256SUMS.txt](https://github.com/yuan-xin-9997/NoOccupy/releases/latest/download/SHA256SUMS.txt) | 最新安装包的 SHA-256 校验值。 |
-| **[购买激活码](https://nooccupy.yuan-xin.top/)** | 在销售网站购买激活码。 |
+| **[获取激活码](https://nooccupy.yuan-xin.top/)** | 试用结束后在销售网站获取激活码。 |
 
 **系统要求：** Windows 10 / Windows 11（64 位）、.NET Framework 4.8 或更高版本，以及管理员权限。
 
@@ -80,7 +81,7 @@
 2. 在 Windows 管理员权限提示中选择允许。
 3. 选择界面语言和安装目录，默认目录为 `C:\Program Files\NoOccupy`。
 4. 点击 **安装**。安装器会添加资源管理器右键菜单、开始菜单快捷方式和系统卸载项。
-5. 启动 NoOccupy。v1.1.0 需要激活，输入收到的激活码。
+5. 启动 NoOccupy。自动开始 30 天免费试用，无需账号，无需付款。
 
 桌面快捷方式默认不创建，可以在安装界面中勾选。
 
@@ -102,20 +103,26 @@ Get-FileHash .\NoOccupy-Setup.exe -Algorithm SHA256
 
 </details>
 
-## 激活与购买
+## 免费试用与激活
 
-NoOccupy v1.1.0 开始支持 **离线激活**：
+### 30 天免费试用
 
-- 首次启动时，激活窗口会显示形如 `A1B2-C3D4-E5F6-G7H8` 的机器码。
-- 在 [销售网站](https://nooccupy.yuan-xin.top/) 购买激活码，并按页面提示提交机器码。
+安装后即可使用全部功能，无需账号、无需付款。
+
+- 试用按**当天打开过软件的自然日**计数：不打开软件的日子不消耗试用。
+- 主界面会显示“试用中 · 剩 N 天”。
+- **卸载重装不会刷新试用**：试用进度保存在本机，重装后继续。
+
+### 激活（试用结束后）
+
+- 试用结束后（或随时），激活窗口会显示形如 `A1B2-C3D4-E5F6-G7H8` 的机器码。
+- 在 [销售网站](https://nooccupy.yuan-xin.top/) 获取激活码，并按页面提示提交机器码；价格只在结账页显示。
 - 把收到的激活码粘贴到软件中，点击 **激活**。
 - 激活由内嵌公钥离线验证，不访问授权服务器。
 
-激活窗口和主界面都提供购买入口。没有激活码时，点击激活窗口中的 **购买激活码**，或访问 [销售网站](https://nooccupy.yuan-xin.top/)。
+激活窗口和主界面都提供购买入口：点击 **购买激活码**，或访问 [销售网站](https://nooccupy.yuan-xin.top/)。
 
-授权价格为 **4.99 美元**，一次买断，最多可在 **2 台电脑** 上激活，包含 **1 年授权更新**。
-
-> v1.1.0 是当前版本，安装后必须激活。请从 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases/latest) 下载，在 [销售网站](https://nooccupy.yuan-xin.top/) 购买激活码，然后用软件显示的机器码完成激活。
+> 请从 [Releases](https://github.com/yuan-xin-9997/NoOccupy/releases/latest) 下载当前版本。安装后自动开始 30 天免费试用；试用结束后，一次买断的激活码可以让软件继续使用。
 
 ## 快速上手
 
@@ -151,9 +158,13 @@ NoOccupy 注册的是资源管理器传统右键菜单。Windows 11 将此类入
 
 检测其他进程持有的句柄、结束进程、注册系统级右键菜单以及保存整机激活信息需要提升权限。主程序和安装器启动时都会申请管理员权限。
 
+### 免费试用是怎么算的？
+
+NoOccupy 提供 30 天免费试用：只有当天打开过软件才计为一天，不打开软件的日子不消耗试用。主界面会显示“试用中 · 剩 N 天”。试用进度保存在 `%ProgramData%\NoOccupy\trial.state` 和注册表中，卸载重装不会刷新试用。试用结束后输入激活码即可继续使用。
+
 ### 如何激活？
 
-启动程序后，如果出现激活窗口，复制机器码并发给销售方，或直接在 [销售网站](https://nooccupy.yuan-xin.top/) 购买。收到激活码后粘贴并点击 **激活**。验证完全离线。
+试用结束后启动程序，或通过主界面的授权入口打开激活窗口。窗口会显示机器码，在 [销售网站](https://nooccupy.yuan-xin.top/) 获取激活码后粘贴并点击 **激活**。验证完全离线。
 
 ### 激活需要联网吗？
 
@@ -161,13 +172,13 @@ NoOccupy 注册的是资源管理器传统右键菜单。Windows 11 将此类入
 
 ### 会常驻后台或上传文件吗？
 
-程序不发起网络请求，不安装后台服务，打开时扫描，关闭即退出。激活由内嵌公钥离线验证，不连接授权服务器。语言偏好保存在注册表中，激活信息保存在 `%ProgramData%\NoOccupy`，诊断日志可能写入 Windows 临时目录。
+程序在日常使用中不发起网络请求，不安装后台服务，打开时扫描，关闭即退出。激活由内嵌公钥离线验证，不连接授权服务器。唯一的可选联网请求是匿名卸载调研，只发送你选择的原因和选填留言，也可以跳过。语言偏好保存在注册表中，激活信息和试用进度保存在 `%ProgramData%\NoOccupy`，诊断日志可能写入 Windows 临时目录。
 
 ### 如何卸载？
 
 打开 **Windows 设置 → 应用 → 已安装的应用**，找到上表中当前语言对应的名称，点击 **卸载**。也可使用控制面板，或运行安装目录中的 `NoOccupyUninstall.exe`。
 
-卸载会移除程序目录、右键菜单、开始菜单快捷方式和系统卸载项。激活信息默认保留在 `%ProgramData%\NoOccupy`，同一台机器重装后无需重新激活。需要彻底清除时，可在卸载前运行：
+卸载会移除程序目录、右键菜单、开始菜单快捷方式和系统卸载项。激活信息和试用进度默认保留在 `%ProgramData%\NoOccupy`，同一台机器重装后无需重新激活，30 天试用也不会被刷新。图形卸载会先显示可跳过的匿名卸载调研（静默卸载不显示）。需要清除激活信息时，可在卸载前运行：
 
 ```powershell
 & "C:\Program Files\NoOccupy\NoOccupy.exe" --deactivate
